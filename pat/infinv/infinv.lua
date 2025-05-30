@@ -3,6 +3,8 @@ require "/pat/infinv/TabList.lua"
 require "/pat/infinv/ItemGrid.lua"
 require "/pat/infinv/IconPicker.lua"
 
+require "/pat/infinv/WidgetCallbacks.lua"
+
 function init()
   local cfg = config.getParameter
 
@@ -97,57 +99,6 @@ function setTabIcon(widgetName, image)
   if image then
     widget.setImage(widgetName, image)
   end
-end
-
--- widget callbacks --
-function newTabButton()
-  local tab = TabList:newTab()
-  tab:select()
-end
-
-function arrowButton(_, offset)
-  local tab = TabList:getSelected()
-  if not tab then return end
-  tab:move(tab.index + offset)
-end
-
-function deleteTabButton()
-  local tab = TabList:getSelected()
-  if not tab then return end
-
-  local index = tab.index
-  tab:remove()
-
-  local new = TabList.tabs[index] or TabList.tabs[index - 1]
-  if new then new:select() end
-end
-
-function tabConfigCheckbox()
-  updateWidgets()
-end
-
-function tabIconSelect()
-  local tab = TabList:getSelected()
-  if not tab then return end
-  
-  local icon = IconPicker:getSelected()
-  tab.data.iconIndex = icon.index
-  setTabIcon(tab.children.icon, icon.image)
-end
-
-function labelTextbox()
-  local text = widget.getText("tabConfig.labelTextbox")
-  if text and text:len() == 0 then text = nil end
-  
-  local tab = TabList:getSelected()
-  if not tab then return end
-  tab.data.label = text
-
-  updateTitle()
-end
-
-function labelTextboxBlur(name)
-  widget.blur("tabConfig."..name)
 end
 
 -- widget wrapper sludge --
