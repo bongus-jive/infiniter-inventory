@@ -91,6 +91,14 @@ function updateTitle()
   pane.setTitle(Strings.title, subtitle)
 end
 
+function setTabIcon(widgetName, image)
+  widget.setImage(widgetName, "")
+  widget.setImageScale(widgetName, 1)
+  if image then
+    widget.setImage(widgetName, image)
+  end
+end
+
 -- widget callbacks --
 function newTabButton()
   local tab = TabList:newTab()
@@ -124,7 +132,7 @@ function tabIconSelect()
   
   local icon = IconPicker:getSelected()
   tab.data.iconIndex = icon.index
-  widget.setImage(tab.children.icon, icon.image or "")
+  setTabIcon(tab.children.icon, icon.image)
 end
 
 function labelTextbox()
@@ -150,7 +158,7 @@ function TabList:buildTab(tab)
   end
 
   local image = IconPicker:getImage(data.iconIndex)
-  widget.setImage(tab.children.icon, image)
+  setTabIcon(tab.children.icon, image)
 end
 
 function TabList:onSelect(tab, oldTab)
