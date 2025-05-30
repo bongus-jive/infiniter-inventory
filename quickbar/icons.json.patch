@@ -1,0 +1,11 @@
+[
+  {
+    "op": "add",
+    "path": "/items/patman:infinv",
+    "value": {
+      "label": "Infinite Inventory",
+      "icon": "/pat/infinv/images/icon.png",
+      "action": [ "pane", "/pat/infinv/infinv.config" ]
+    }
+  }
+]
