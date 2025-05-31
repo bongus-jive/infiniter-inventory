@@ -78,6 +78,7 @@ function updateWidgets()
 
   widget.setVisible("slots", tabSelected and not editingTab)
   widget.setVisible("tabConfig", tabSelected and editingTab)
+  widget.setVisible("tabConfigBg", tabSelected and editingTab)
   widget.setButtonEnabled("tabConfigCheckbox", tabSelected)
   widget.setButtonEnabled("tabConfig.moveTabUpButton", tabSelected and tab.index ~= 1)
   widget.setButtonEnabled("tabConfig.moveTabDownButton", tabSelected and tab.index ~= tabCount)
