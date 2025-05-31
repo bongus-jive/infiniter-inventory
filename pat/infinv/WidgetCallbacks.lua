@@ -11,6 +11,8 @@ function Callbacks.moveTabButton(_, offset)
 end
 
 function Callbacks.deleteTabButton()
+  if ItemGrid:hasItems() then return end
+
   local tab = TabList:getSelected()
   if not tab then return end
 
