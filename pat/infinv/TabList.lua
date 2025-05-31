@@ -78,8 +78,8 @@ function TabItem:init()
   self.parent.tabIds[self.id] = self
 
   self.children = {}
-  if self.parent.data.initChildrem then
-    for _, name in ipairs(self.parent.data.initChildrem) do
+  if self.parent.data.initChildren then
+    for _, name in ipairs(self.parent.data.initChildren) do
       self:initChild(name)
     end
   end
