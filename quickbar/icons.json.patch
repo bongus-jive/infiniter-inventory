@@ -3,8 +3,9 @@
     "op": "add",
     "path": "/items/patman:infinv",
     "value": {
-      "label": "Infinite Inventory",
+      "label": "^#ff80ce;Infinite Inventory",
       "icon": "/pat/infinv/images/icon.png",
+      "weight": -666,
       "action": [ "pane", "/pat/infinv/infinv.config" ]
     }
   }
