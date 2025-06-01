@@ -131,3 +131,18 @@ end
 function TabItem:deselect()
   if self:isSelected() then self.parent:deselect() end
 end
+
+function TabItem:setIcon(image)
+  widget.removeChild(self.widgetName, "icon")
+  self.children.icon = nil
+
+  if not image then return end
+
+  local iconConfig = {
+    [type(image) == "string" and "file" or "drawables"] = image
+  }
+  iconConfig = sb.jsonMerge(self.parent.data.iconTemplate, iconConfig)
+  
+  widget.addChild(self.widgetName, iconConfig, "icon")
+  self:initChild("icon")
+end

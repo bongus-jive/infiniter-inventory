@@ -33,7 +33,33 @@ function Callbacks.tabIconSelect()
   
   local icon = IconPicker:getSelected()
   tab.data.iconIndex = icon.index
-  setTabIcon(tab.children.icon, icon.image)
+  updateTabIcon(tab)
+end
+
+function Callbacks.tabIconSlot()
+  local item = player.swapSlotItem()
+  if not item then return end
+
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  local current = IconPicker:getIconSlotItem()
+  if item and current and root.itemDescriptorsMatch(item, current, true) then
+    item = nil
+  end
+
+  IconPicker:setIconSlotItem(item)
+  tab.data.iconItem = item
+  updateTabIcon(tab)
+end
+
+function Callbacks.tabIconSlotRight()
+  IconPicker:setIconSlotItem(nil)
+
+  local tab = TabList:getSelected()
+  if not tab then return end
+  tab.data.iconItem = nil
+  updateTabIcon(tab)
 end
 
 function Callbacks.tabLabelTextbox()

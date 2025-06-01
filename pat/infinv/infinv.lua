@@ -8,7 +8,7 @@ require "/pat/infinv/WidgetCallbacks.lua"
 function init()
   local cfg = config.getParameter
 
-  Strings = cfg("strings")
+  Strings = cfg("strings", {})
   Strings.tooltips = Strings.tooltips or {}
 
   TabList:init("tabs.list")
@@ -39,7 +39,6 @@ function uninit()
   if tab then
     tab.data.items = ItemGrid:getItems()
   end
-  ItemGrid:clearItems()
 
   local data = jarray()
   
@@ -62,6 +61,10 @@ function createTooltip(pos)
 
   local data = widget.getData(child)
   if type(data) ~= "table" then return end
+
+  if data.tooltipKey then
+    return Strings.tooltips[data.tooltipKey]
+  end
 
   if data.parentTabId then
     local tab = TabList.tabs[data.parentTabId]
@@ -94,12 +97,39 @@ function updateTitle()
   pane.setTitle(Strings.title, subtitle)
 end
 
-function setTabIcon(widgetName, image)
-  widget.setImage(widgetName, "")
-  widget.setImageScale(widgetName, 1)
-  if image then
-    widget.setImage(widgetName, image)
+function getItemIcon(item)
+  if not item then return end
+  
+  item = root.itemConfig(item)
+  local icon = item.parameters.inventoryIcon or item.config.inventoryIcon
+  if not icon then return end
+
+  local function absolutePath(path)
+    if path and path:sub(1, 1) ~= "/" then return item.directory .. path end
+    return path
   end
+
+  if type(icon) == "string" then
+    return absolutePath(icon)
+  end
+
+  for _, drawable in pairs(icon) do
+    drawable.image = absolutePath(drawable.image)
+  end
+  return icon
+end
+
+function updateTabIcon(tab)
+  if not tab then return end
+
+  local image
+  if tab.data.iconIndex == -1 then
+    image = getItemIcon(tab.data.iconItem)
+  else
+    image = IconPicker:getImage(tab.data.iconIndex)
+  end
+
+  tab:setIcon(image)
 end
 
 -- widget wrapper sludge --
@@ -109,8 +139,7 @@ function TabList:buildTab(tab)
     data.iconIndex = ((tab.index - 1) % self.data.defaultIconIndexMax) + 1
   end
 
-  local image = IconPicker:getImage(data.iconIndex)
-  setTabIcon(tab.children.icon, image)
+  updateTabIcon(tab)
 end
 
 function TabList:onSelect(tab, oldTab)
@@ -129,6 +158,7 @@ function TabList:onSelect(tab, oldTab)
   end
 
   IconPicker:setSelected(tab.data.iconIndex or 1)
+  IconPicker:setIconSlotItem(tab.data.iconItem)
   ItemGrid:setItems(tab.data.items)
 end
 
