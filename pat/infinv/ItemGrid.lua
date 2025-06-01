@@ -151,7 +151,7 @@ function ItemGrid:countToString(num)
     return fmt("%.1fm", num / 10e5)
   elseif num >= 10e3 then
     return fmt("%dk", math.floor(num / 10e2))
-  elseif num >= 10e2 then
+  elseif num > 10e2 then
     return fmt("%.1fk", num / 10e2)
   end
 
