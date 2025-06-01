@@ -192,7 +192,6 @@ function ItemGrid:condenseStacks()
         local stackWithItem = items[j]
         if stackWithItem then
           self:stackWith(item, stackWithItem)
-          chat.addMessage(sb.printJson(items))
           if stackWithItem.count <= 0 then
             jremove(items, j)
           end
