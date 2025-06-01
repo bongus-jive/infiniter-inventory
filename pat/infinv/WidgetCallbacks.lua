@@ -23,6 +23,11 @@ function Callbacks.deleteTabButton()
   if new then new:select() end
 end
 
+function Callbacks.sortButton()
+  ItemGrid:condenseStacks()
+  ItemGrid:sort()
+end
+
 function Callbacks.tabConfigCheckbox()
   updateWidgets()
 end
