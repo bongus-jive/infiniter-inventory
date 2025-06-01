@@ -132,13 +132,14 @@ function TabItem:deselect()
   if self:isSelected() then self.parent:deselect() end
 end
 
-function TabItem:setIcon(image)
+function TabItem:setIcon(image, rotation)
   widget.removeChild(self.widgetName, "icon")
   self.children.icon = nil
 
   if not image then return end
 
   local iconConfig = {
+    rotation = rotation,
     [type(image) == "string" and "file" or "drawables"] = image
   }
   iconConfig = sb.jsonMerge(self.parent.data.iconTemplate, iconConfig)

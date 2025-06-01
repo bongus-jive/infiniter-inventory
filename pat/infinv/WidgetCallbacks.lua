@@ -39,7 +39,7 @@ end
 function Callbacks.tabIconSelect()
   local tab = TabList:getSelected()
   if not tab then return end
-  
+
   local icon = IconPicker:getSelected()
   tab.data.iconIndex = icon.index
   updateTabIcon(tab)
@@ -57,8 +57,12 @@ function Callbacks.tabIconSlot()
     item = nil
   end
 
+  jremove(tab.data, "iconItem")
+  if item then
+    tab.data.iconItem = item
+  end
+
   IconPicker:setIconSlotItem(item)
-  tab.data.iconItem = item
   updateTabIcon(tab)
 end
 
@@ -67,7 +71,7 @@ function Callbacks.tabIconSlotRight()
 
   local tab = TabList:getSelected()
   if not tab then return end
-  tab.data.iconItem = nil
+  jremove(tab.data, "iconItem")
   updateTabIcon(tab)
 end
 
@@ -88,4 +92,19 @@ end
 
 function Callbacks.tabConfigTextboxBlur(name)
   widget.blur("tabConfig." .. name)
+end
+
+function Callbacks.rotateIconButton()
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  local rot = tab.data.iconRotation or 360
+  rot = rot - 90
+  if rot <= 0 then
+    jremove(tab.data, "iconRotation")
+  else
+    tab.data.iconRotation = rot
+  end
+
+  updateTabIcon(tab)
 end

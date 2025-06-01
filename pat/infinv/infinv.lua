@@ -129,7 +129,10 @@ function updateTabIcon(tab)
     image = IconPicker:getImage(tab.data.iconIndex)
   end
 
-  tab:setIcon(image)
+  local rot = tab.data.iconRotation
+  if rot then rot = rot * (math.pi / 180) end
+
+  tab:setIcon(image, rot)
 end
 
 -- widget wrapper sludge --
