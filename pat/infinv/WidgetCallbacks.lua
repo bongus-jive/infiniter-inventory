@@ -64,11 +64,15 @@ end
 
 function Callbacks.tabLabelTextbox()
   local text = widget.getText("tabConfig.labelTextbox")
-  if text and text:len() == 0 then text = nil end
   
   local tab = TabList:getSelected()
   if not tab then return end
-  tab.data.label = text
+  
+  if text and text:len() > 0 then
+    tab.data.label = text
+  else
+    jremove(tab.data, "label")
+  end
 
   updateTitle()
 end

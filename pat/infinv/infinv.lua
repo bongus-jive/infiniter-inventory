@@ -21,6 +21,7 @@ function init()
     if tabData.selected then
       tab:select()
     end
+    jremove(tabData, "selected")
   end
 
   if #TabList.tabs == 0 then
@@ -38,12 +39,11 @@ function uninit()
   local tab = TabList:getSelected()
   if tab then
     tab.data.items = ItemGrid:getItems()
+    tab.data.selected = true
   end
 
   local data = jarray()
-  
   for i, tab in ipairs(TabList.tabs) do
-    tab.selected = tab:isSelected() or nil
     data[i] = tab.data
   end
 
