@@ -13,7 +13,7 @@ function init()
 
   TabList:init("tabs.list")
   ItemGrid:init("slots", cfg("slotCount"))
-  IconPicker:init("tabConfig.iconList", root.assetJson("/pat/infinv/tabicons/tabicons.json"))
+  IconPicker:init("tabConfig.iconList", root.assetJson("/pat/infinv/tabicons.json"))
   
   local data = InvData.load()
   for _, tabData in ipairs(data) do
