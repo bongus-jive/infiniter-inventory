@@ -238,3 +238,53 @@ function ItemGrid:sort()
 
   self:setItems(items)
 end
+
+function ItemGrid:quickStack()
+  local items = self:getItems()
+
+  local extraItems = {}
+  local emptySlots = {}
+
+  for i = 1, self.slotCount do
+    local item = items[i]
+    if not item then
+      table.insert(emptySlots, i)
+      goto continue
+    end
+
+    local hasCount = player.hasCountOfItem(item, true)
+    if hasCount == 0 then goto continue end
+
+    local max = self:getMaxStack(item)
+    local take = math.min(hasCount, max - item.count)
+    local consumed = player.consumeItem({item.name, take, item.parameters}, true, true)
+    item.count = item.count + consumed.count
+
+    if hasCount > consumed.count then
+      table.insert(extraItems, item)
+    end
+
+    ::continue::
+  end
+
+  for _, item in ipairs(extraItems) do
+    local hasCount = player.hasCountOfItem(item, true)
+    if hasCount == 0 then goto continue end
+
+    while hasCount > 0 do
+      if #emptySlots == 0 then break end
+      
+      local slot = emptySlots[1]
+      table.remove(emptySlots, 1)
+
+      local take = math.min(hasCount, self:getMaxStack(item))
+      local consumed = player.consumeItem({item.name, take, item.parameters}, true, true)
+      items[slot] = consumed
+      hasCount = hasCount - consumed.count
+    end
+
+    ::continue::
+  end
+
+  self:setItems(items)
+end

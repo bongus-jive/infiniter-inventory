@@ -28,6 +28,10 @@ function Callbacks.sortButton()
   ItemGrid:sort()
 end
 
+function Callbacks.quickStackbutton()
+  ItemGrid:quickStack()
+end
+
 function Callbacks.tabConfigCheckbox()
   updateWidgets()
 end
