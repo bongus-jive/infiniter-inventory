@@ -6,13 +6,14 @@ function ItemGrid:init(name, slotCount)
   self.slots = {}
   self.slotCount = slotCount
   self.defaultMaxStack = root.assetJson("/items/defaultParameters.config:defaultMaxStack")
+  self.data = widget.getData(self.widgetName) or {}
 
   widget.clearListItems(self.widgetName)
 
   self:registerSlotCallback("slot", self.leftClick)
   self:registerSlotCallback("slot.right", self.rightClick)
   
-  for i = 1, self.slotCount or 1 do
+  for i = self.slotCount or 1, 1, -1 do
     local slot = {}
     slot.index = i
     slot.id = widget.addListItem(self.widgetName)
@@ -21,6 +22,15 @@ function ItemGrid:init(name, slotCount)
     slot.countLabel = fmt("%s.count", slot.parentName)
     self.slots[i] = slot
     widget.setData(slot.name, slot.index)
+  end
+
+  for i = 1, math.floor(self.slotCount / 2) do
+    local slot1 = self.slots[i]
+    local slot2 = self.slots[self.slotCount - i + 1]
+    local pos1 = widget.getPosition(slot1.parentName)
+    local pos2 = widget.getPosition(slot2.parentName)
+    widget.setPosition(slot1.parentName, pos2)
+    widget.setPosition(slot2.parentName, pos1)
   end
 end
 
