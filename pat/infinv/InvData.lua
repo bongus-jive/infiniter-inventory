@@ -1,4 +1,4 @@
-local ID = "pat_infiniteinventory"
+local ID = "pat-infiniteinventory"
 InvData = {}
 
 function InvData.load()
