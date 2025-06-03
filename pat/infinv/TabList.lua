@@ -54,11 +54,6 @@ function TabList:deselect()
   widget.removeListItem(self.widgetName, #self.tabs)
 end
 
--------------------------------------------------
-
-local TabItem = {}
-TabList.TabItem = TabItem
-
 function TabList:newTab(data)
   local new = {}
   setmetatable(new, {__index = self.TabItem})
@@ -71,6 +66,11 @@ function TabList:newTab(data)
 
   return new
 end
+
+-------------------------------------------------
+
+local TabItem = {}
+TabList.TabItem = TabItem
 
 function TabItem:init()
   self.id = widget.addListItem(self.parent.widgetName)
