@@ -23,6 +23,10 @@ function Callbacks.deleteTabButton()
   if new then new:select() end
 end
 
+function Callbacks.pageScrolling(up)
+  Callbacks.changePage(nil, up and 1 or -1)
+end
+
 function Callbacks.changePage(_, offset)
   local tab = TabList:getSelected()
   if not tab then return end

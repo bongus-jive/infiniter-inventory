@@ -2,7 +2,7 @@ require "/pat/infinv/InvData.lua"
 require "/pat/infinv/TabList.lua"
 require "/pat/infinv/ItemGrid.lua"
 require "/pat/infinv/IconPicker.lua"
-
+require "/pat/infinv/ScrollInput.lua"
 require "/pat/infinv/WidgetCallbacks.lua"
 
 function init()
@@ -14,6 +14,8 @@ function init()
   TabList:init("tabs.list")
   ItemGrid:init("slots", cfg("slotCount"))
   IconPicker:init("tabConfig.iconList", root.assetJson("/pat/infinv/images/tabicons/tabicons.json"))
+
+  PageScroller = ScrollInput:new("pageScroller", Callbacks.pageScrolling)
   
   local data = InvData.load()
   for _, tabData in ipairs(data) do
@@ -33,6 +35,10 @@ function init()
   end
 
   updateWidgets()
+end
+
+function cursorOverride(pos)
+  PageScroller:update(pos)
 end
 
 function uninit()
@@ -89,6 +95,7 @@ function updateWidgets()
   local enabled = tabSelected and not editingTab
 
   widget.setVisible("slots", enabled)
+  widget.setVisible("pageScroller", enabled)
   widget.setVisible("tabConfig", tabSelected and editingTab)
   widget.setVisible("tabConfigBg", tabSelected and editingTab)
 
