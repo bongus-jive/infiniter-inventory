@@ -23,6 +23,29 @@ function Callbacks.deleteTabButton()
   if new then new:select() end
 end
 
+function Callbacks.changePage(_, offset)
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  local currentIndex = tab.data.pageIndex
+  local pages = tab.data.pages
+  
+  if currentIndex == #pages and not ItemGrid:hasItems() then
+    if currentIndex == 1 or offset > 0 then return end
+    table.remove(pages)
+  else
+    saveCurrentPage(tab)
+  end
+
+  local newIndex = math.max(1, math.min(currentIndex + offset, #pages + 1))
+  tab.data.pageIndex = newIndex
+
+  if newIndex > #pages then pages[newIndex] = jarray() end
+  ItemGrid:setItems(pages[newIndex])
+
+  updateWidgets()
+end
+
 function Callbacks.sortButton()
   ItemGrid:condenseStacks()
   ItemGrid:sort()

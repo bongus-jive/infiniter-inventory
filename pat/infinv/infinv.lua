@@ -38,7 +38,7 @@ end
 function uninit()
   local tab = TabList:getSelected()
   if tab then
-    tab.data.items = ItemGrid:getItems()
+    saveCurrentPage()
     tab.data.selected = true
   end
 
@@ -72,20 +72,36 @@ function createTooltip(pos)
   end
 end
 
+function saveCurrentPage(tab)
+  tab = tab or TabList:getSelected()
+  if not tab then return end
+  local index = tab.data.pageIndex
+  tab.data.pages[index] = ItemGrid:getItems()
+end
+
 function updateWidgets()
   local tabCount = #TabList.tabs
   local tab = TabList:getSelected()
   local tabSelected = tab ~= nil
-  local gridHasitems = ItemGrid:hasItems()
+  local gridHasItems = ItemGrid:hasItems()
   local editingTab = widget.getChecked("tabConfigCheckbox")
+  
+  local enabled = tabSelected and not editingTab
 
-  widget.setVisible("slots", tabSelected and not editingTab)
+  widget.setVisible("slots", enabled)
   widget.setVisible("tabConfig", tabSelected and editingTab)
   widget.setVisible("tabConfigBg", tabSelected and editingTab)
+
   widget.setButtonEnabled("tabConfigCheckbox", tabSelected)
+  widget.setButtonEnabled("prevPageButton", enabled and tab.data.pageIndex > 1)
+  widget.setButtonEnabled("nextPageButton", enabled and (tab.data.pageIndex < #tab.data.pages or gridHasItems))
+  widget.setButtonEnabled("sortButton", enabled)
+  widget.setButtonEnabled("quickStackButton", enabled)
   widget.setButtonEnabled("tabConfig.moveTabUpButton", tabSelected and tab.index ~= 1)
   widget.setButtonEnabled("tabConfig.moveTabDownButton", tabSelected and tab.index ~= tabCount)
-  widget.setButtonEnabled("tabConfig.deleteTabButton", tabSelected and tabCount > 1 and not gridHasitems)
+  widget.setButtonEnabled("tabConfig.deleteTabButton", tabSelected and tabCount > 1 and not gridHasItems)
+
+  widget.setText("pageLabel", tab and string.format("%s/%s", tab.data.pageIndex, #tab.data.pages) or "h")
 end
 
 function updateTitle()
@@ -138,6 +154,11 @@ end
 -- widget wrapper sludge --
 function TabList:buildTab(tab)
   local data = tab.data
+
+  if not data.pages then data.pages = jarray() end
+  if not data.pages[1] then data.pages[1] = jarray() end
+  if not data.pageIndex then data.pageIndex = 1 end
+
   if not data.iconIndex then
     data.iconIndex = ((tab.index - 1) % self.data.defaultIconIndexMax) + 1
   end
@@ -147,14 +168,13 @@ end
 
 function TabList:onSelect(tab, oldTab)
   if oldTab then
-    oldTab.data.items = ItemGrid:getItems()
+    saveCurrentPage(oldTab)
   end
-
-  updateWidgets()
-
+  
   local label = tab and tab.data.label or ""
   widget.setText("tabConfig.labelTextbox", label)
   updateTitle()
+  updateWidgets()
 
   if not tab then
     return ItemGrid:clearItems()
@@ -162,7 +182,9 @@ function TabList:onSelect(tab, oldTab)
 
   IconPicker:setSelected(tab.data.iconIndex or 1)
   IconPicker:setIconSlotItem(tab.data.iconItem)
-  ItemGrid:setItems(tab.data.items)
+
+  local pageIndex = math.max(1, math.min(tab.data.pageIndex, #tab.data.pages))
+  ItemGrid:setItems(tab.data.pages[pageIndex])
 end
 
 function ItemGrid:onSlotItemChanged(slot)
