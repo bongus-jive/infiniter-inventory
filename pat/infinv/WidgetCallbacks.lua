@@ -1,5 +1,6 @@
 Callbacks = {}
 
+-- footer buttons
 function Callbacks.newTabButton()
   TabList:newTab():select()
 end
@@ -23,33 +24,6 @@ function Callbacks.deleteTabButton()
   if new then new:select() end
 end
 
-function Callbacks.pageScrolling(up)
-  Callbacks.changePage(nil, up and 1 or -1)
-end
-
-function Callbacks.changePage(_, offset)
-  local tab = TabList:getSelected()
-  if not tab then return end
-
-  local currentIndex = tab.data.pageIndex
-  local pages = tab.data.pages
-  
-  if currentIndex == #pages and not ItemGrid:hasItems() then
-    if currentIndex == 1 or offset > 0 then return end
-    table.remove(pages)
-  else
-    saveCurrentPage(tab)
-  end
-
-  local newIndex = math.max(1, math.min(currentIndex + offset, #pages + 1))
-  tab.data.pageIndex = newIndex
-
-  if newIndex > #pages then pages[newIndex] = jarray() end
-  ItemGrid:setItems(pages[newIndex])
-
-  updateWidgets()
-end
-
 function Callbacks.sortButton()
   ItemGrid:condenseStacks()
   ItemGrid:sort()
@@ -63,6 +37,36 @@ function Callbacks.tabConfigCheckbox()
   updateWidgets()
 end
 
+-- pages
+function Callbacks.changePage(_, offset)
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  local currentIndex = tab.data.pageIndex
+  local pages = tab.data.pages
+  
+  local newIndex = math.max(1, math.min(currentIndex + offset, #pages + 1))
+  if newIndex == currentIndex then return end
+
+  if currentIndex == #pages and not ItemGrid:hasItems() then
+    if currentIndex == 1 or offset > 0 then return end
+    table.remove(pages)
+  else
+    saveCurrentPage(tab)
+  end
+
+  tab.data.pageIndex = newIndex
+
+  if newIndex > #pages then pages[newIndex] = jarray() end
+  ItemGrid:setItems(pages[newIndex])
+  updateWidgets()
+end
+
+function Callbacks.pageScrolling(up)
+  Callbacks.changePage(nil, up and 1 or -1)
+end
+
+-- tab icons
 function Callbacks.tabIconSelect()
   local tab = TabList:getSelected()
   if not tab then return end
@@ -102,6 +106,22 @@ function Callbacks.tabIconSlotRight()
   updateTabIcon(tab)
 end
 
+function Callbacks.tabIconRotateButton()
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  local rot = tab.data.iconRotation or 360
+  rot = rot - 90
+  if rot <= 0 then
+    jremove(tab.data, "iconRotation")
+  else
+    tab.data.iconRotation = rot
+  end
+
+  updateTabIcon(tab)
+end
+
+--tab label
 function Callbacks.tabLabelTextbox()
   local text = widget.getText("tabConfig.labelTextbox")
   
@@ -117,21 +137,35 @@ function Callbacks.tabLabelTextbox()
   updateTitle()
 end
 
-function Callbacks.tabConfigTextboxBlur(name)
+function Callbacks.tabLabelBlur(name)
   widget.blur("tabConfig." .. name)
 end
 
-function Callbacks.rotateIconButton()
-  local tab = TabList:getSelected()
-  if not tab then return end
+-- the rest
+function Callbacks.gridSlotChanged(slot)
+  updateWidgets()
+end
 
-  local rot = tab.data.iconRotation or 360
-  rot = rot - 90
-  if rot <= 0 then
-    jremove(tab.data, "iconRotation")
-  else
-    tab.data.iconRotation = rot
+function Callbacks.tabSelected(tab, oldTab)
+  if oldTab then
+    saveCurrentPage(oldTab)
+  end
+  
+  local label = tab and tab.data.label or ""
+  widget.setText("tabConfig.labelTextbox", label)
+  updateTitle()
+
+  if not tab then
+    ItemGrid:clearItems()
+    updateWidgets()
+    return
   end
 
-  updateTabIcon(tab)
+  IconPicker:setSelected(tab.data.iconIndex or 1)
+  IconPicker:setIconSlotItem(tab.data.iconItem)
+
+  local pageIndex = math.max(1, math.min(tab.data.pageIndex, #tab.data.pages))
+  ItemGrid:setItems(tab.data.pages[pageIndex])
+
+  updateWidgets()
 end

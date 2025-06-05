@@ -1,21 +1,30 @@
-IconPicker = {}
+IconPickerWidget = {}
 local fmt = string.format
 
-function IconPicker:init(name, images)
-  self.listName = name
-  self.images = images
-  self.data = widget.getData(self.listName)
+function IconPickerWidget:new(name)
+  local new = {}
+  setmetatable(new, {__index = self})
+  new.widgetName = name
+  return new
+end
 
+function IconPickerWidget:init()
+  self.data = widget.getData(self.widgetName)
+
+  self.images = self.data.images or {}
+  if type(self.images) == "string" then
+    self.images = root.assetJson(self.images)
+  end
+
+  widget.clearListItems(self.widgetName)
   self.items = {}
   self.itemIds = {}
 
-  widget.clearListItems(self.listName)
-
   local item = self:addItem(-1)
-  widget.addChild(item.widgetName, self.data.iconSlotTemplate, "slot")
-  self.iconSlot = fmt("%s.slot", item.widgetName)
+  widget.addChild(item.name, self.data.iconSlotTemplate, "slot")
+  self.iconSlot = fmt("%s.slot", item.name)
 
-  local btn = fmt("%s.button", item.widgetName)
+  local btn = fmt("%s.button", item.name)
   local data = widget.getData(btn) or {}
   data.tooltipKey = "tabIconSlot"
   widget.setData(btn, data)
@@ -25,14 +34,14 @@ function IconPicker:init(name, images)
   end
 end
 
-function IconPicker:addItem(index, image)
+function IconPickerWidget:addItem(index, image)
   local item = {}
-  item.id = widget.addListItem(self.listName)
+  item.id = widget.addListItem(self.widgetName)
   item.index = index
-  item.widgetName = fmt("%s.%s", self.listName, item.id)
+  item.name = fmt("%s.%s", self.widgetName, item.id)
 
   if image then
-    local icon = fmt("%s.icon", item.widgetName)
+    local icon = fmt("%s.icon", item.name)
     widget.setImage(icon, image)
   end
 
@@ -41,25 +50,25 @@ function IconPicker:addItem(index, image)
   return item
 end
 
-function IconPicker:getSelected()
-  local id = widget.getListSelected(self.listName)
+function IconPickerWidget:getSelected()
+  local id = widget.getListSelected(self.widgetName)
   return self.itemIds[id]
 end
 
-function IconPicker:setSelected(index)
+function IconPickerWidget:setSelected(index)
   if not index then return end
   local item = self.items[index] or self.items[1]
-  widget.setListSelected(self.listName, item.id)
+  widget.setListSelected(self.widgetName, item.id)
 end
 
-function IconPicker:getImage(index)
+function IconPickerWidget:getImage(index)
   return self.images[index] or ""
 end
 
-function IconPicker:getIconSlotItem()
+function IconPickerWidget:getIconSlotItem()
   return widget.itemSlotItem(self.iconSlot)
 end
 
-function IconPicker:setIconSlotItem(item)
+function IconPickerWidget:setIconSlotItem(item)
   widget.setItemSlotItem(self.iconSlot, item)
 end

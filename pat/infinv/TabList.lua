@@ -1,23 +1,33 @@
-TabList = {}
+TabListWidget = {}
 local fmt = string.format
 
-function TabList:init(name)
-  self.widgetName = name
+function TabListWidget:new(name, callback)
+  local new = {}
+  setmetatable(new, {__index = self})
+  new.TabItem = {}
+  setmetatable(new.TabItem, {__index = self.TabItem})
+
+  new.widgetName = name
+  new.callback = callback
+  return new
+end
+
+function TabListWidget:init()
   self.data = widget.getData(self.widgetName) or {}
   self:clear()
 
-  self.SelectCallback = function()
-    if self._skipSelectCallback then self._skipSelectCallback = false; return end
+  self._selectCallback = function()
+    if self._skipSelectCallback then return end
 
     local oldTab = self.selectedTab
     local newTab = self:getSelected()
-    if self.onSelect then
-      self:onSelect(newTab, oldTab)
+    if self.callback then
+      self.callback(newTab, oldTab)
     end
   end
 end
 
-function TabList:clear()
+function TabListWidget:clear()
   widget.clearListItems(self.widgetName)
   self.tabs = {}
   self.tabIds = {}
@@ -25,7 +35,7 @@ function TabList:clear()
   setmetatable(self.tabs, {__index = self.tabIds})
 end
 
-function TabList:rebuild()
+function TabListWidget:rebuild()
   widget.clearListItems(self.widgetName)
   for _, tab in ipairs(self.tabs) do
     self.tabIds[tab.id] = nil
@@ -33,28 +43,29 @@ function TabList:rebuild()
   end
 end
 
-function TabList:reindex(start)
+function TabListWidget:reindex(start)
   for i = (start or 1), #self.tabs do
     self.tabs[i].index = i
   end
 end
 
-function TabList:getSelected()
+function TabListWidget:getSelected()
   local id = widget.getListSelected(self.widgetName)
   self.selectedTab = self.tabs[id]
   return self.selectedTab
 end
 
-function TabList:deselect()
+function TabListWidget:deselect()
   if not widget.getListSelected(self.widgetName) then return end
 
   self._skipSelectCallback = true
   local new = widget.addListItem(self.widgetName)
   widget.setListSelected(self.widgetName, new)
   widget.removeListItem(self.widgetName, #self.tabs)
+  self._skipSelectCallback = false
 end
 
-function TabList:newTab(data)
+function TabListWidget:newTab(data)
   local new = {}
   setmetatable(new, {__index = self.TabItem})
 
@@ -70,7 +81,7 @@ end
 -------------------------------------------------
 
 local TabItem = {}
-TabList.TabItem = TabItem
+TabListWidget.TabItem = TabItem
 
 function TabItem:init()
   self.id = widget.addListItem(self.parent.widgetName)
@@ -98,6 +109,7 @@ function TabItem:initChild(name)
 end
 
 function TabItem:remove()
+  self:deselect()
   widget.removeListItem(self.parent.widgetName, self.index - 1)
   self.parent.tabIds[self.id] = nil
   table.remove(self.parent.tabs, self.index)

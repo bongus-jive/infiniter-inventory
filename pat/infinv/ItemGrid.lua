@@ -1,40 +1,65 @@
-ItemGrid = {}
+ItemGridWidget = {}
 local fmt = string.format
 
-function ItemGrid:init(name, slotCount)
-  self.widgetName = name
-  self.slots = {}
-  self.slotCount = slotCount
+function ItemGridWidget:new(name, callback)
+  local new = {}
+  setmetatable(new, {__index = self})
+  new.widgetName = name
+  new.callback = callback
+  return new
+end
+
+function ItemGridWidget:init()
   self.defaultMaxStack = root.assetJson("/items/defaultParameters.config:defaultMaxStack")
   self.data = widget.getData(self.widgetName) or {}
+  self.slotCount = self.data.slotCount or 1
+  self.slots = {}
 
   widget.clearListItems(self.widgetName)
 
   self:registerSlotCallback("slot", self.leftClick)
   self:registerSlotCallback("slot.right", self.rightClick)
   
-  for i = self.slotCount or 1, 1, -1 do
+  for i = self.slotCount, 1, -1 do
     local slot = {}
     slot.index = i
     slot.id = widget.addListItem(self.widgetName)
-    slot.parentName = fmt("%s.%s", self.widgetName, slot.id)
-    slot.name = fmt("%s.slot", slot.parentName)
-    slot.countLabel = fmt("%s.count", slot.parentName)
+    slot.name = fmt("%s.%s", self.widgetName, slot.id)
+    slot.itemSlot = fmt("%s.slot", slot.name)
+    slot.countLabel = fmt("%s.count", slot.name)
     self.slots[i] = slot
-    widget.setData(slot.name, slot.index)
+    widget.setData(slot.itemSlot, slot.index)
   end
 
   for i = 1, math.floor(self.slotCount / 2) do
     local slot1 = self.slots[i]
     local slot2 = self.slots[self.slotCount - i + 1]
-    local pos1 = widget.getPosition(slot1.parentName)
-    local pos2 = widget.getPosition(slot2.parentName)
-    widget.setPosition(slot1.parentName, pos2)
-    widget.setPosition(slot2.parentName, pos1)
+    local pos1 = widget.getPosition(slot1.name)
+    local pos2 = widget.getPosition(slot2.name)
+    widget.setPosition(slot1.name, pos2)
+    widget.setPosition(slot2.name, pos1)
   end
 end
 
-function ItemGrid:hasItems()
+function ItemGridWidget:getSlotItem(slot)
+  if not slot then return end
+  return widget.itemSlotItem(slot.itemSlot)
+end
+
+function ItemGridWidget:setSlotItem(slot, item, skipCallback)
+  if item and item.count <= 0 then item = nil end
+  widget.setItemSlotItem(slot.itemSlot, item)
+
+  if self.callback and not skipCallback then self.callback(slot) end
+
+  widget.setVisible(slot.countLabel, item ~= nil)
+  if not item then return end
+
+  local count = self:countToString(item.count)
+  widget.setText(slot.countLabel, count)
+end
+
+function ItemGridWidget:hasItems()
   for i = 1, self.slotCount do
     local slot = self.slots[i]
     if self:getSlotItem(slot) then
@@ -44,7 +69,7 @@ function ItemGrid:hasItems()
   return false
 end
 
-function ItemGrid:getItems()
+function ItemGridWidget:getItems()
   local items = jarray()
   jresize(items, self.slotCount)
   for i = 1, self.slotCount do
@@ -54,31 +79,31 @@ function ItemGrid:getItems()
   return items
 end
 
-function ItemGrid:setItems(items)
+function ItemGridWidget:setItems(items)
   if not items then return self:clearItems() end
-  
+
   for i = 1, self.slotCount do
     local slot = self.slots[i]
     local item = items[i]
-    self:setSlotItem(slot, item)
+    self:setSlotItem(slot, item, true)
   end
 end
 
-function ItemGrid:clearItems()
+function ItemGridWidget:clearItems()
   for i = 1, self.slotCount do
     local slot = self.slots[i]
-    self:setSlotItem(slot, nil)
+    self:setSlotItem(slot, nil, true)
   end
 end
 
-function ItemGrid:registerSlotCallback(callbackName, callback)
+function ItemGridWidget:registerSlotCallback(callbackName, callback)
   widget.registerMemberCallback(self.widgetName, callbackName, function(_, index)
     if not index or not self.slots[index] then return end
     callback(self, self.slots[index])
   end)
 end
 
-function ItemGrid:leftClick(slot)
+function ItemGridWidget:leftClick(slot)
   local slotItem = self:getSlotItem(slot)
   
   if slotItem and self:shiftHeld() then
@@ -98,7 +123,7 @@ function ItemGrid:leftClick(slot)
   player.setSwapSlotItem(slotItem)
 end
 
-function ItemGrid:rightClick(slot)
+function ItemGridWidget:rightClick(slot)
   local slotItem = self:getSlotItem(slot)
   if not slotItem then return end
   
@@ -127,32 +152,12 @@ function ItemGrid:rightClick(slot)
   player.setSwapSlotItem(swapItem)
 end
 
-function ItemGrid:shiftHeld()
+function ItemGridWidget:shiftHeld()
   if not input then return false end
   return input.key("LShift") or input.key("RShift")
 end
 
-function ItemGrid:getSlotItem(slot)
-  if not slot then return end
-  return widget.itemSlotItem(slot.name)
-end
-
-function ItemGrid:setSlotItem(slot, item)
-  if item and item.count <= 0 then item = nil end
-  widget.setItemSlotItem(slot.name, item)
-
-  if self.onSlotItemChanged then
-    self:onSlotItemChanged(slot)
-  end
-
-  widget.setVisible(slot.countLabel, item ~= nil)
-  if not item then return end
-
-  local count = self:countToString(item.count)
-  widget.setText(slot.countLabel, count)
-end
-
-function ItemGrid:countToString(num)
+function ItemGridWidget:countToString(num)
   if not num or num == 1 then return "" end
 
   if num >= 10e6 then
@@ -168,11 +173,11 @@ function ItemGrid:countToString(num)
   return tostring(num)
 end
 
-function ItemGrid:getMaxStack(item)
+function ItemGridWidget:getMaxStack(item)
   return item.parameters.maxStack or root.itemConfig(item).config.maxStack or self.defaultMaxStack
 end
 
-function ItemGrid:couldStack(item1, item2)
+function ItemGridWidget:couldStack(item1, item2)
   if item1 and item2 and root.itemDescriptorsMatch(item1, item2, true) then
     local max = self:getMaxStack(item1)
     if item1.count < max then
@@ -182,7 +187,7 @@ function ItemGrid:couldStack(item1, item2)
   return 0
 end
 
-function ItemGrid:stackWith(item1, item2)
+function ItemGridWidget:stackWith(item1, item2)
   local take = self:couldStack(item1, item2)
   if take > 0 and item2.count >= take then
     item1.count = item1.count + take
@@ -192,7 +197,7 @@ function ItemGrid:stackWith(item1, item2)
   return false
 end
 
-function ItemGrid:condenseStacks()
+function ItemGridWidget:condenseStacks()
   local items = self:getItems()
 
   for i = self.slotCount, 1, -1 do
@@ -219,7 +224,7 @@ local itemTypes = {
   chestarmor = 13, legsarmor = 14, backarmor = 15, consumable = 16, blueprint = 17, codex = 18, inspectiontool = 19, instrument = 20, thrownitem = 22, unlockitem = 23, activeitem = 24, augmentitem = 25
 }
 
-function ItemGrid:sort()
+function ItemGridWidget:sort()
   local items = jarray()
   jresize(items, self.slotCount)
   for i = 1, self.slotCount do
@@ -249,8 +254,9 @@ function ItemGrid:sort()
   self:setItems(items)
 end
 
-function ItemGrid:quickStack()
+function ItemGridWidget:quickStack()
   local items = self:getItems()
+  local hasStacked = false
 
   local extraItems = {}
   local emptySlots = {}
@@ -264,6 +270,7 @@ function ItemGrid:quickStack()
 
     local hasCount = player.hasCountOfItem(item, true)
     if hasCount == 0 then goto continue end
+    hasStacked = true
 
     local max = self:getMaxStack(item)
     local take = math.min(hasCount, max - item.count)
@@ -296,5 +303,5 @@ function ItemGrid:quickStack()
     ::continue::
   end
 
-  self:setItems(items)
+  if hasStacked then self:setItems(items) end
 end
