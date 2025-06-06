@@ -9,32 +9,16 @@ function PageBarWidget:new(name)
 end
 
 function PageBarWidget:init()
+  self.canvas = widget.bindCanvas(self.widgetName)
   self.size = widget.getSize(self.widgetName)
   self.data = widget.getData(self.widgetName)
-
-  local img = "/assetmissing.png?crop=0;0;1;1?multiply=0000?replace;0000=%s?scalenearest=%s;%s"
-
-  widget.addChild(self.widgetName, {
-    type = "image",
-    file = fmt(img, self.data.backColor, self.size[1], self.size[2])
-  }, "bg")
-
-  widget.addChild(self.widgetName, {
-    type = "imageStretch",
-    size = {0, 0},
-    stretchSet = {
-      type = "stretch",
-      inner = fmt(img, self.data.color, 1, self.size[2])
-    }
-  }, "bar")
-
-  self.barName = fmt("%s.bar", self.widgetName)
 end
 
 function PageBarWidget:set(value, max)
+  local pos = self.size[1] * (value - 1) / max
   local width = math.ceil(self.size[1] / max)
-  widget.setSize(self.barName, {width, self.size[2]})
 
-  local pos = self.size[1] * ((value - 1) / max)
-  widget.setPosition(self.barName, {pos, 0})
+  self.canvas:clear()
+  self.canvas:drawRect({0, 0, self.size[1], self.size[2]}, self.data.backColor)
+  self.canvas:drawRect({pos, 0, pos + width, self.size[2]}, self.data.color)
 end
