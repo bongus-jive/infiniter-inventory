@@ -9,9 +9,9 @@ require "/pat/infinv/ScrollInput.lua"
 local fmt = string.format
 
 TabList = TabListWidget:new("tabs.list", Callbacks.tabSelected)
-ItemGrid = ItemGridWidget:new("slots", Callbacks.gridSlotChanged)
-IconPicker = IconPickerWidget:new("tabConfig.iconList")
-PageScroller = ScrollInputWidget:new("pageScroller", Callbacks.pageScrolling)
+ItemGrid = ItemGridWidget:new("gridLayout.slots", Callbacks.gridSlotChanged)
+IconPicker = IconPickerWidget:new("editorLayout.settings.iconList")
+PageScroller = ScrollInputWidget:new("gridLayout.pageScroller", Callbacks.pageScrolling)
 
 function init()
   TabList:init()
@@ -87,37 +87,42 @@ end
 
 function updateWidgets()
   local tab = TabList:getSelected()
-  local isTabSelected = tab ~= nil
+  local hasTab = tab ~= nil
+  local tabCount = #TabList.tabs
+  local pageIndex = tab and tab.data.pageIndex or 0
+  local pageCount = tab and #tab.data.pages or 0
+
   local gridHasItems = ItemGrid:hasItems()
-  local isEditingTab = isTabSelected and widget.getChecked("tabConfigCheckbox")
-  local enabled = isTabSelected and not isEditingTab
-  
-  if isEditingTab then
-    local tabCount = #TabList.tabs
-    local canDeleteTab = tabCount > 1 and not gridHasItems
-    if canDeleteTab then
-      for _, page in pairs(tab.data.pages) do
-        for _, item in pairs(page) do canDeleteTab = false break end
-        if not canDeleteTab then break end
-      end
+  local tabHasItems = gridHasItems
+  if not tabHasItems and pageCount > 1 then
+    for _, page in pairs(tab.data.pages) do
+      if next(page) then tabHasItems = true break end
     end
-    widget.setButtonEnabled("tabConfig.deleteTabButton", canDeleteTab)
-    widget.setButtonEnabled("tabConfig.moveTabUpButton", tab.index ~= 1)
-    widget.setButtonEnabled("tabConfig.moveTabDownButton",  tab.index ~= tabCount)
   end
 
-  widget.setVisible("slots", enabled)
-  widget.setVisible("pageScroller", enabled)
-  widget.setVisible("tabConfig", isEditingTab)
-  widget.setVisible("tabConfigBg", isEditingTab)
+  local editMode = hasTab and widget.getChecked("tabConfigCheckbox")
+  widget.setVisible("gridLayout", hasTab and not editMode)
+  widget.setVisible("editorLayout", editMode)
 
-  widget.setButtonEnabled("sortButton", enabled)
-  widget.setButtonEnabled("quickStackButton", enabled)
-  widget.setButtonEnabled("prevPageButton", enabled and tab.data.pageIndex > 1)
-  widget.setButtonEnabled("nextPageButton", enabled and (tab.data.pageIndex < #tab.data.pages or gridHasItems))
-  widget.setButtonEnabled("tabConfigCheckbox", isTabSelected)
+  widget.setButtonEnabled("tabConfigCheckbox", hasTab)
+  widget.setButtonEnabled("sortButton", hasTab)
+  widget.setButtonEnabled("quickStackButton", hasTab)
+  widget.setButtonEnabled("gridLayout.prevPageButton", hasTab and pageIndex > 1)
+  widget.setButtonEnabled("gridLayout.nextPageButton", hasTab and (pageIndex < pageCount or gridHasItems))
 
-  widget.setText("pageLabel", tab and fmt("%s/%s", tab.data.pageIndex, #tab.data.pages) or "")
+  widget.setButtonEnabled("editorLayout.settings.moveTabUpButton", hasTab and tab.index ~= 1)
+  widget.setButtonEnabled("editorLayout.settings.moveTabDownButton", hasTab and tab.index ~= tabCount)
+  widget.setButtonEnabled("editorLayout.settings.deleteTabButton", hasTab and tabCount > 1 and not tabHasItems)
+
+  local maxPages = pageCount
+  if tab then
+    if pageIndex == pageCount then
+      if gridHasItems then maxPages = maxPages + 1 end
+    elseif next(tab.data.pages) then
+      maxPages = maxPages + 1
+    end
+  end
+  widget.setText("gridLayout.pageLabel", tab and fmt("%s/%s", pageIndex, maxPages) or "")
 end
 
 function updateTitle()

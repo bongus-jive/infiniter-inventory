@@ -9,7 +9,7 @@ function IconPickerWidget:new(name)
 end
 
 function IconPickerWidget:init()
-  self.data = widget.getData(self.widgetName)
+  self.data = widget.getData(self.widgetName) or {}
 
   self.images = self.data.images or {}
   if type(self.images) == "string" then
