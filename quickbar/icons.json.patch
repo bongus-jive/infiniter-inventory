@@ -5,7 +5,7 @@
     "value": {
       "label": "^#ff80ce;Infinite Inventory",
       "icon": "/pat/infinv/images/icon.png",
-      "weight": -666,
+      "weight": -665.9,
       "action": [ "pane", "/pat/infinv/infinv.config" ]
     }
   }
