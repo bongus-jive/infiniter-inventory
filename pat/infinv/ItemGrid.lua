@@ -206,17 +206,15 @@ function ItemGridWidget:condenseStacks()
 
   for i = self.slotCount, 1, -1 do
     local item = items[i]
-    if item then
-      for j = 1, i - 1 do
-        local stackWithItem = items[j]
-        if stackWithItem then
-          self:stackWith(item, stackWithItem)
-          if stackWithItem.count <= 0 then
-            jremove(items, j)
-          end
-        end
+    if not item then goto continue end
+
+    for j = 1, i - 1 do
+      local stackWithItem = items[j]
+      if stackWithItem and self:stackWith(item, stackWithItem) and stackWithItem.count <= 0 then
+        jremove(items, j)
       end
     end
+    ::continue::
   end
 
   self:setItems(items)
