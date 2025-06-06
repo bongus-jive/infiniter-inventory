@@ -129,7 +129,7 @@ function updateWidgets()
       maxPages = maxPages + 1
     end
   end
-  widget.setText("gridLayout.pageLabel", tab and fmt("%s/%s", pageIndex, maxPages) or "")
+  widget.setText("gridLayout.pageLabel", tab and fmt(Strings.pageText, pageIndex, maxPages) or "")
   PageBar:set(pageIndex, maxPages)
 end
 
