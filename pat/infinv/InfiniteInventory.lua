@@ -66,18 +66,22 @@ function createTooltip(pos)
 end
 
 function uninit()
+  save()
+end
+
+function save()
   local tab = TabList:getSelected()
   if tab then
     saveCurrentPage(tab)
     tab.data.selected = true
   end
 
-  local data = jarray()
+  local tabs = jarray()
   for i, tab in ipairs(TabList.tabs) do
-    data[i] = tab.data
+    tabs[i] = tab.data
   end
 
-  InvData.save(data)
+  InvData.save(tabs)
 end
 
 function saveCurrentPage(tab)

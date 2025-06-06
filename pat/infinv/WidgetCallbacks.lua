@@ -57,7 +57,7 @@ function Callbacks.changePage(_, offset)
 
   tab.data.pageIndex = newIndex
 
-  if newIndex > #pages then pages[newIndex] = jarray() end
+  if not pages[newIndex] then pages[newIndex] = jarray() end
   ItemGrid:setItems(pages[newIndex])
   updateWidgets()
 end
@@ -144,6 +144,7 @@ end
 -- the rest
 function Callbacks.gridSlotChanged(slot)
   updateWidgets()
+  save()
 end
 
 function Callbacks.tabSelected(tab, oldTab)

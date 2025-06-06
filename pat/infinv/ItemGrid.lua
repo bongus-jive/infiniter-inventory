@@ -87,6 +87,8 @@ function ItemGridWidget:setItems(items)
     local item = items[i]
     self:setSlotItem(slot, item, true)
   end
+
+  if self.callback then self.callback() end
 end
 
 function ItemGridWidget:clearItems()
@@ -94,6 +96,8 @@ function ItemGridWidget:clearItems()
     local slot = self.slots[i]
     self:setSlotItem(slot, nil, true)
   end
+
+  if self.callback then self.callback() end
 end
 
 function ItemGridWidget:registerSlotCallback(callbackName, callback)
