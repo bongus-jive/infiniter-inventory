@@ -5,6 +5,7 @@ require "/pat/infinv/TabList.lua"
 require "/pat/infinv/ItemGrid.lua"
 require "/pat/infinv/IconPicker.lua"
 require "/pat/infinv/ScrollInput.lua"
+require "/pat/infinv/PageBar.lua"
 
 local fmt = string.format
 
@@ -12,12 +13,14 @@ TabList = TabListWidget:new("tabs.list", Callbacks.tabSelected)
 ItemGrid = ItemGridWidget:new("gridLayout.slots", Callbacks.gridSlotChanged)
 IconPicker = IconPickerWidget:new("editorLayout.settings.iconList")
 PageScroller = ScrollInputWidget:new("gridLayout.pageScroller", Callbacks.pageScrolling)
+PageBar = PageBarWidget:new("gridLayout.pageBar")
 
 function init()
   TabList:init()
   ItemGrid:init()
   IconPicker:init()
   PageScroller:init()
+  PageBar:init()
 
   local cfg = config.getParameter
   Strings = cfg("strings", {})
@@ -105,8 +108,8 @@ function updateWidgets()
   widget.setVisible("editorLayout", editMode)
 
   widget.setButtonEnabled("tabConfigCheckbox", hasTab)
-  widget.setButtonEnabled("sortButton", hasTab)
-  widget.setButtonEnabled("quickStackButton", hasTab)
+  widget.setButtonEnabled("sortButton", hasTab and not editMode)
+  widget.setButtonEnabled("quickStackButton", hasTab and not editMode)
   widget.setButtonEnabled("gridLayout.prevPageButton", hasTab and pageIndex > 1)
   widget.setButtonEnabled("gridLayout.nextPageButton", hasTab and (pageIndex < pageCount or gridHasItems))
 
@@ -123,6 +126,7 @@ function updateWidgets()
     end
   end
   widget.setText("gridLayout.pageLabel", tab and fmt("%s/%s", pageIndex, maxPages) or "")
+  PageBar:set(pageIndex, maxPages)
 end
 
 function updateTitle()
