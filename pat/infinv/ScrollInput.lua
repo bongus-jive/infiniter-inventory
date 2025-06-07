@@ -12,6 +12,7 @@ end
 function ScrollInputWidget:init(name, callback)
   self.position = {0, 0}
   self.size = widget.getSize(self.widgetName)
+  self._skip = 3
   
   self.origin = fmt("%s.origin", self.widgetName)
   self.wheelUp = fmt("%s.wheel.up", self.widgetName)
@@ -40,6 +41,12 @@ function ScrollInputWidget:update(mousePos)
 
   if not widget.inMember(self.origin, self.position) then
     self.position = self:findOrigin(mousePos)
+  end
+
+  if self._skip then
+    self._skip = self._skip - 1
+    if self._skip <= 0 then self._skip = nil end
+    return
   end
 
   if not widget.inMember(self.wheelTarget, self.position) then
