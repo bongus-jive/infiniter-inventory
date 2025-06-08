@@ -1,19 +1,19 @@
 require "/pat/infinv/WidgetCallbacks.lua"
-require "/pat/infinv/InvData.lua"
-
+require "/pat/infinv/VJsonTuah.lua"
 require "/pat/infinv/TabList.lua"
 require "/pat/infinv/ItemGrid.lua"
 require "/pat/infinv/IconPicker.lua"
 require "/pat/infinv/ScrollInput.lua"
 require "/pat/infinv/PageBar.lua"
 
-local fmt = string.format
-
+InvData = VJsonTuah:new("pat-infiniteinventory")
 TabList = TabListWidget:new("tabs.list", Callbacks.tabSelected)
 ItemGrid = ItemGridWidget:new("gridLayout.slots", Callbacks.gridSlotChanged)
 IconPicker = IconPickerWidget:new("editorLayout.settings.iconList")
 PageScroller = ScrollInputWidget:new("gridLayout.pageScroller", Callbacks.pageScrolling)
 PageBar = PageBarWidget:new("gridLayout.pageBar")
+
+local fmt = string.format
 
 function init()
   TabList:init()
@@ -26,7 +26,7 @@ function init()
   Strings = cfg("strings", {})
   Strings.tooltips = Strings.tooltips or {}
   
-  local data = InvData.load()
+  local data = InvData:load()
   for _, tabData in ipairs(data) do
     local tab = TabList:newTab(tabData)
     if tabData.selected then tab:select() end
@@ -86,7 +86,7 @@ function save()
     tabs[i] = tab.data
   end
 
-  InvData.save(tabs)
+  InvData:save(tabs)
 end
 
 function saveCurrentPage(tab)
