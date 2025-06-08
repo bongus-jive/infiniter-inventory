@@ -16,7 +16,7 @@ end
 
 function PageBarWidget:set(value, max)
   local pos = self.size[1] * (value - 1) / max
-  local width = math.ceil(self.size[1] / max)
+  local width = self.size[1] / max
 
   self.canvas:clear()
   self.canvas:drawRect({0, 0, self.size[1], self.size[2]}, self.data.backColor)

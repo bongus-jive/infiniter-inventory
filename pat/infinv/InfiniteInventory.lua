@@ -107,6 +107,8 @@ function updateWidgets()
     end
   end
 
+  if not hasTab then widget.setChecked("tabConfigCheckbox", false) end
+
   local editMode = hasTab and widget.getChecked("tabConfigCheckbox")
   widget.setVisible("gridLayout", hasTab and not editMode)
   widget.setVisible("editorLayout", editMode)
@@ -119,7 +121,7 @@ function updateWidgets()
 
   widget.setButtonEnabled("editorLayout.settings.moveTabUpButton", hasTab and tab.index ~= 1)
   widget.setButtonEnabled("editorLayout.settings.moveTabDownButton", hasTab and tab.index ~= tabCount)
-  widget.setButtonEnabled("editorLayout.settings.deleteTabButton", hasTab and tabCount > 1 and not tabHasItems)
+  widget.setButtonEnabled("editorLayout.settings.deleteTabButton", hasTab and not tabHasItems)
 
   local maxPages = pageCount
   if tab then

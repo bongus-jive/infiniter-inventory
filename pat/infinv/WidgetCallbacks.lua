@@ -12,16 +12,18 @@ function Callbacks.moveTabButton(_, offset)
 end
 
 function Callbacks.deleteTabButton()
-  if ItemGrid:hasItems() then return end
-
   local tab = TabList:getSelected()
   if not tab then return end
+
+  if ItemGrid:hasItems() then return end
 
   local index = tab.index
   tab:remove()
 
   local new = TabList.tabs[index] or TabList.tabs[index - 1]
   if new then new:select() end
+
+  updateWidgets()
 end
 
 function Callbacks.sortButton()
