@@ -65,6 +65,11 @@ function createTooltip(pos)
   end
 end
 
+function shiftItemFromInventory(item) -- osb
+  local remainder = ItemGrid:addItem(item)
+  return remainder or true
+end
+
 function uninit()
   save()
 end
