@@ -39,10 +39,6 @@ function init()
   updateWidgets()
 end
 
-function cursorOverride(pos)
-  PageScroller:update(pos)
-end
-
 function createTooltip(pos)
   local child = widget.getChildAt(pos)
   if not child then return end
@@ -63,6 +59,10 @@ function createTooltip(pos)
     local tab = TabList.tabs[data.parentTabId]
     return tab and tab.data.label
   end
+end
+
+function cursorOverride(pos)
+  PageScroller:update(pos)
 end
 
 function shiftItemFromInventory(item) -- osb
