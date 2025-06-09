@@ -47,7 +47,7 @@ function ItemGridWidget:getSlotItem(slot)
 end
 
 function ItemGridWidget:setSlotItem(slot, item, skipCallback)
-  if item and item.count <= 0 then item = nil end
+  if self:isItemEmpty(item) then item = nil end
   widget.setItemSlotItem(slot.itemSlot, item)
 
   if self.callback and not skipCallback then self.callback(slot) end
@@ -57,6 +57,32 @@ function ItemGridWidget:setSlotItem(slot, item, skipCallback)
 
   local count = self:countToString(item.count)
   widget.setText(slot.countLabel, count)
+end
+
+function ItemGridWidget:addItem(inputItem)
+  local firstEmptySlot, hasStacked
+
+  for i = 1, self.slotCount do
+    local slot = self.slots[i]
+
+    local slotItem = self:getSlotItem(slot)
+    if slotItem then
+      if self:stackWith(slotItem, inputItem) then
+        hasStacked = true
+        self:setSlotItem(slot, slotItem)
+        if self:isItemEmpty(inputItem) then return end
+      end
+    elseif not firstEmptySlot then
+      firstEmptySlot = slot
+    end
+  end
+
+  if firstEmptySlot then
+    self:setSlotItem(firstEmptySlot, inputItem)
+    return
+  end
+
+  return inputItem
 end
 
 function ItemGridWidget:hasItems()
@@ -120,7 +146,7 @@ function ItemGridWidget:leftClick(slot)
   if not swapItem and not slotItem then return end
 
   if self:stackWith(swapItem, slotItem) then
-    if slotItem.count <= 0 then slotItem = nil end
+    if self:isItemEmpty(slotItem) then slotItem = nil end
   end
   
   self:setSlotItem(slot, swapItem)
@@ -150,7 +176,7 @@ function ItemGridWidget:rightClick(slot)
   end
 
   slotItem.count = slotItem.count - take
-  if slotItem.count <= 0 then slotItem = nil end
+  if self:isItemEmpty(slotItem) then slotItem = nil end
   
   self:setSlotItem(slot, slotItem)
   player.setSwapSlotItem(swapItem)
@@ -175,6 +201,10 @@ function ItemGridWidget:countToString(num)
   end
 
   return tostring(num)
+end
+
+function ItemGridWidget:isItemEmpty(item)
+  return not (item and item.count > 0)
 end
 
 function ItemGridWidget:getMaxStack(item)
@@ -210,7 +240,7 @@ function ItemGridWidget:condenseStacks()
 
     for j = 1, i - 1 do
       local stackWithItem = items[j]
-      if stackWithItem and self:stackWith(item, stackWithItem) and stackWithItem.count <= 0 then
+      if stackWithItem and self:stackWith(item, stackWithItem) and self:isItemEmpty(stackWithItem) then
         jremove(items, j)
       end
     end
