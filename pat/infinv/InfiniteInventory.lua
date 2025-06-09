@@ -1,10 +1,10 @@
 require "/pat/infinv/WidgetCallbacks.lua"
 require "/pat/infinv/VJsonTuah.lua"
-require "/pat/infinv/TabList.lua"
-require "/pat/infinv/ItemGrid.lua"
-require "/pat/infinv/IconPicker.lua"
-require "/pat/infinv/ScrollInput.lua"
-require "/pat/infinv/PageBar.lua"
+require "/pat/infinv/widgets/TabList.lua"
+require "/pat/infinv/widgets/ItemGrid.lua"
+require "/pat/infinv/widgets/IconPicker.lua"
+require "/pat/infinv/widgets/ScrollInput.lua"
+require "/pat/infinv/widgets/PageBar.lua"
 
 InvData = VJsonTuah:new("pat-infiniteinventory")
 TabList = TabListWidget:new("tabs.list", Callbacks.tabSelected)
