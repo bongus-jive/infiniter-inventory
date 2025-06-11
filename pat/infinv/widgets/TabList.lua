@@ -36,11 +36,14 @@ function TabListWidget:clear()
 end
 
 function TabListWidget:rebuild()
+  self._skipSelectCallback = true
   widget.clearListItems(self.widgetName)
   for _, tab in ipairs(self.tabs) do
     self.tabIds[tab.id] = nil
     tab:init()
   end
+  if self.selectedTab then self.selectedTab:select() end
+  self._skipSelectCallback = false
 end
 
 function TabListWidget:reindex(start)
@@ -106,10 +109,9 @@ function TabItem:initChild(name)
 end
 
 function TabItem:remove()
-  self:deselect()
   widget.removeListItem(self.parent.widgetName, self.index - 1)
-  self.parent.tabIds[self.id] = nil
   table.remove(self.parent.tabs, self.index)
+  self.parent.tabIds[self.id] = nil
   self.parent:reindex(self.index)
 end
 
@@ -117,15 +119,11 @@ function TabItem:move(newIndex)
   newIndex = math.max(1, math.min(#self.parent.tabs, newIndex))
   if self.index == newIndex then return end
 
-  local selected = self:isSelected()
-
   table.remove(self.parent.tabs, self.index)
   table.insert(self.parent.tabs, newIndex, self)
 
   self.parent:reindex()
   self.parent:rebuild()
-
-  if selected then self:select() end
 end
 
 function TabItem:isSelected()
