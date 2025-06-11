@@ -73,38 +73,16 @@ function Callbacks.tabIconSelected()
   local tab = TabList:getSelected()
   if not tab then return end
 
-  local icon = IconPicker:getSelected()
-  tab.data.iconIndex = icon.index
+  tab.data.iconIndex = IconPicker:getSelected()
   updateTabIcon(tab)
 end
 
-function Callbacks.tabIconSlot()
-  local item = player.swapSlotItem()
-  if not item then return end
-
+function Callbacks.tabIconSlot(item)
   local tab = TabList:getSelected()
   if not tab then return end
 
-  local current = IconPicker:getIconSlotItem()
-  if item and current and root.itemDescriptorsMatch(item, current, true) then
-    item = nil
-  end
-
   jremove(tab.data, "iconItem")
-  if item then
-    tab.data.iconItem = item
-  end
-
-  IconPicker:setIconSlotItem(item)
-  updateTabIcon(tab)
-end
-
-function Callbacks.tabIconSlotRight()
-  IconPicker:setIconSlotItem(nil)
-
-  local tab = TabList:getSelected()
-  if not tab then return end
-  jremove(tab.data, "iconItem")
+  if item then tab.data.iconItem = item end
   updateTabIcon(tab)
 end
 

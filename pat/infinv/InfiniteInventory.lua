@@ -9,7 +9,7 @@ require "/pat/infinv/widgets/PageBar.lua"
 InvData = VJsonTuah:new("pat-infiniteinventory")
 TabList = TabListWidget:new("tabs.list", Callbacks.tabSelected)
 ItemGrid = ItemGridWidget:new("gridLayout.slots", Callbacks.gridSlotChanged)
-IconPicker = IconPickerWidget:new("editorLayout.settings.iconList")
+IconPicker = IconPickerWidget:new("editorLayout.settings.iconList", Callbacks.tabIconSlot)
 PageScroller = ScrollInputWidget:new("gridLayout.pageScroller", Callbacks.pageScrolling)
 PageBar = PageBarWidget:new("gridLayout.pageBar")
 

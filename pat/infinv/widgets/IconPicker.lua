@@ -1,10 +1,11 @@
 IconPickerWidget = {}
 local fmt = string.format
 
-function IconPickerWidget:new(name)
+function IconPickerWidget:new(name, slotCallback)
   local new = {}
   setmetatable(new, {__index = self})
   new.widgetName = name
+  new.slotCallback = slotCallback
   return new
 end
 
@@ -27,6 +28,9 @@ function IconPickerWidget:init()
   for i, image in ipairs(self.images) do
     self:addItem(i, image)
   end
+
+  self._slotLeft = function() self:slotLeft() end
+  self._slotRight = function() self:slotRight() end
 end
 
 function IconPickerWidget:addItem(index, image)
@@ -48,7 +52,7 @@ end
 
 function IconPickerWidget:getSelected()
   local id = widget.getListSelected(self.widgetName)
-  return self.itemIds[id]
+  return self.itemIds[id].index
 end
 
 function IconPickerWidget:setSelected(index)
@@ -92,4 +96,22 @@ function IconPickerWidget:getItemIcon(item)
     drawable.image = absolutePath(drawable.image)
   end
   return icon
+end
+
+function IconPickerWidget:slotLeft()
+  local item = player.swapSlotItem()
+  if not item then return end
+
+  local current = self:getIconSlotItem()
+  if item and current and root.itemDescriptorsMatch(item, current, true) then
+    item = nil
+  end
+
+  self:setIconSlotItem(item)
+  if self.slotCallback then self.slotCallback(item) end
+end
+
+function IconPickerWidget:slotRight()
+  self:setIconSlotItem()
+  if self.slotCallback then self.slotCallback() end
 end
