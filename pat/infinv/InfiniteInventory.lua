@@ -53,9 +53,13 @@ function createTooltip(pos)
     return Strings.tooltips[data.tooltipKey]
   end
 
-  if data.parentTabId then
-    local tab = TabList.tabs[data.parentTabId]
+  if data.parent == TabList.widgetName then
+    local tab = TabList.tabs[data.index]
     return tab and tab.data.label
+  end
+  
+  if data.parent == IconPicker.widgetName and data.index == -1 then
+    return Strings.tooltips.tabIconSlot
   end
 end
 

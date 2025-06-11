@@ -99,7 +99,8 @@ end
 function TabItem:initChild(name)
   local child = fmt("%s.%s", self.widgetName, name)
   local data = widget.getData(child) or {}
-  data.parentTabId = self.id
+  data.parent = self.parent.widgetName
+  data.index = self.index
   widget.setData(child, data)
   self.children[name] = child
 end
@@ -142,7 +143,6 @@ end
 
 function TabItem:setIcon(image, rotation)
   widget.removeChild(self.widgetName, "icon")
-  self.children.icon = nil
 
   if not image then return end
 
@@ -153,5 +153,4 @@ function TabItem:setIcon(image, rotation)
   iconConfig = sb.jsonMerge(self.parent.data.iconTemplate, iconConfig)
   
   widget.addChild(self.widgetName, iconConfig, "icon")
-  self:initChild("icon")
 end

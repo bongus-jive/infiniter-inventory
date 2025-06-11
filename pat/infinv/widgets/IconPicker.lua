@@ -24,11 +24,6 @@ function IconPickerWidget:init()
   widget.addChild(item.name, self.data.iconSlotTemplate, "slot")
   self.iconSlot = fmt("%s.slot", item.name)
 
-  local btn = fmt("%s.button", item.name)
-  local data = widget.getData(btn) or {}
-  data.tooltipKey = "tabIconSlot"
-  widget.setData(btn, data)
-
   for i, image in ipairs(self.images) do
     self:addItem(i, image)
   end
@@ -39,6 +34,7 @@ function IconPickerWidget:addItem(index, image)
   item.id = widget.addListItem(self.widgetName)
   item.index = index
   item.name = fmt("%s.%s", self.widgetName, item.id)
+  widget.setData(fmt("%s.button", item.name), { parent = self.widgetName, index = index })
 
   if image then
     local icon = fmt("%s.icon", item.name)
