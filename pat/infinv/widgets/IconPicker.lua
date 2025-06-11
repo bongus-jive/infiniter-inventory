@@ -61,7 +61,10 @@ function IconPickerWidget:setSelected(index)
   widget.setListSelected(self.widgetName, item.id)
 end
 
-function IconPickerWidget:getImage(index)
+function IconPickerWidget:getImage(index, item)
+  if index == -1 then
+    return self:getItemIcon(item)
+  end
   return self.images[index] or ""
 end
 
@@ -71,4 +74,26 @@ end
 
 function IconPickerWidget:setIconSlotItem(item)
   widget.setItemSlotItem(self.iconSlot, item)
+end
+
+function IconPickerWidget:getItemIcon(item)
+  item = root.itemConfig(item)
+  if not item then return end
+  
+  local icon = item.parameters.inventoryIcon or item.config.inventoryIcon
+  if not icon then return end
+
+  local function absolutePath(path)
+    if path and path:sub(1, 1) ~= "/" then return item.directory .. path end
+    return path
+  end
+
+  if type(icon) == "string" then
+    return absolutePath(icon)
+  end
+
+  for _, drawable in pairs(icon) do
+    drawable.image = absolutePath(drawable.image)
+  end
+  return icon
 end

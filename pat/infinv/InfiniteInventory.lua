@@ -152,39 +152,11 @@ end
 function updateTabIcon(tab)
   if not tab then return end
 
-  local image
-  if tab.data.iconIndex == -1 then
-    image = getItemIcon(tab.data.iconItem)
-  else
-    image = IconPicker:getImage(tab.data.iconIndex)
-  end
-
+  local image = IconPicker:getImage(tab.data.iconIndex, tab.data.iconItem)
   local rot = tab.data.iconRotation
   if rot then rot = rot * (math.pi / 180) end
 
   tab:setIcon(image, rot)
-end
-
-function getItemIcon(item)
-  if not item then return end
-  
-  item = root.itemConfig(item)
-  local icon = item.parameters.inventoryIcon or item.config.inventoryIcon
-  if not icon then return end
-
-  local function absolutePath(path)
-    if path and path:sub(1, 1) ~= "/" then return item.directory .. path end
-    return path
-  end
-
-  if type(icon) == "string" then
-    return absolutePath(icon)
-  end
-
-  for _, drawable in pairs(icon) do
-    drawable.image = absolutePath(drawable.image)
-  end
-  return icon
 end
 
 function TabList:buildTab(tab)

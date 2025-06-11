@@ -69,7 +69,7 @@ function Callbacks.pageScrolling(up)
 end
 
 -- tab icons
-function Callbacks.tabIconSelect()
+function Callbacks.tabIconSelected()
   local tab = TabList:getSelected()
   if not tab then return end
 
