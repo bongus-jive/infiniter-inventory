@@ -94,10 +94,6 @@ function TabItem:init()
       self:initChild(name)
     end
   end
-
-  if self.parent.buildTab then
-    self.parent:buildTab(self)
-  end
 end
 
 function TabItem:initChild(name)

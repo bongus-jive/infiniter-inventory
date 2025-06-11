@@ -2,7 +2,7 @@ Callbacks = {}
 
 -- footer buttons
 function Callbacks.newTabButton()
-  TabList:newTab():select()
+  createNewTab():select()
 end
 
 function Callbacks.moveTabButton(_, offset)

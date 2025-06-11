@@ -28,12 +28,10 @@ function init()
   
   local data = InvData:load()
   for _, tabData in ipairs(data) do
-    local tab = TabList:newTab(tabData)
-    if tabData.selected then tab:select() end
-    jremove(tabData, "selected")
+    createNewTab(tabData)
   end
 
-  if #TabList.tabs == 0 then TabList:newTab() end
+  if #TabList.tabs == 0 then createNewTab():select() end
   if not TabList:getSelected() then TabList.tabs[1]:select() end
 
   updateWidgets()
@@ -159,16 +157,20 @@ function updateTabIcon(tab)
   tab:setIcon(image, rot)
 end
 
-function TabList:buildTab(tab)
-  local data = tab.data
+function createNewTab(data)
+  local tab = TabList:newTab(data)
+  data = tab.data
+
+  if data.selected then tab:select() end
+  jremove(data, "selected")
 
   if not data.pages then data.pages = jarray() end
   if not data.pages[1] then data.pages[1] = jarray() end
   if not data.pageIndex then data.pageIndex = 1 end
-
   if not data.iconIndex then
-    data.iconIndex = ((tab.index - 1) % self.data.defaultIconMaxIndex) + 1
+    data.iconIndex = ((tab.index - 1) % TabList.data.defaultIconMaxIndex) + 1
   end
 
   updateTabIcon(tab)
+  return tab
 end
