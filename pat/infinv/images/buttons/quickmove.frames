@@ -1,0 +1,12 @@
+{
+  "frameGrid": {
+    "size": [ 32, 12 ],
+    "dimensions": [ 2, 4 ],
+    "names": [
+      [ "in", "in.hover" ],
+      [ "in.checked", "in.hover.checked" ],
+      [ "out", "out.hover" ],
+      [ "out.checked", "out.hover.checked" ]
+    ]
+  }
+}

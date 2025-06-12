@@ -136,7 +136,7 @@ end
 function ItemGridWidget:leftClick(slot)
   local slotItem = self:getSlotItem(slot)
   
-  if slotItem and self:shiftHeld() then
+  if slotItem and self:isShiftHeld() then
     self:setSlotItem(slot, nil)
     player.giveItem(slotItem)
     return
@@ -164,7 +164,7 @@ function ItemGridWidget:rightClick(slot)
   if swapItem and swapItem.count >= maxStack then return end
 
   local take = 1
-  if self:shiftHeld() then
+  if self:isShiftHeld() then
     maxTake = swapItem and math.min(maxStack - swapItem.count, slotItem.count) or maxStack
     take = math.max(1, math.min(maxTake, math.floor(slotItem.count / 2)))
   end
@@ -182,9 +182,14 @@ function ItemGridWidget:rightClick(slot)
   player.setSwapSlotItem(swapItem)
 end
 
-function ItemGridWidget:shiftHeld()
+function ItemGridWidget:isShiftHeld()
+  if self.shiftHeld then return true end
   if not input then return false end
   return input.key("LShift") or input.key("RShift")
+end
+
+function ItemGridWidget:setShiftHeld(v)
+  self.shiftHeld = v
 end
 
 function ItemGridWidget:countToString(num)

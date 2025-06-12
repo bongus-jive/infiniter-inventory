@@ -37,6 +37,18 @@ function init()
   updateWidgets()
 end
 
+function update()
+  local item = player.swapSlotItem()
+
+  if item and not HadSwapItem and not BlockQuickMoveIn and widget.getChecked("quickMoveInCheckbox") and TabList:getSelected() then
+    local remainder = ItemGrid:addItem(item)
+    player.setSwapSlotItem(remainder)
+  end
+
+  HadSwapItem = item ~= nil
+  BlockQuickMoveIn = false
+end
+
 function createTooltip(pos)
   local child = widget.getChildAt(pos)
   if not child then return end
@@ -64,10 +76,14 @@ function createTooltip(pos)
 end
 
 function cursorOverride(pos)
+  BlockQuickMoveIn = true
   PageScroller:update(pos)
 end
 
 function shiftItemFromInventory(item) -- osb
+  local tab = TabList:getSelected()
+  if not tab then return end
+  
   local remainder = ItemGrid:addItem(item)
   return remainder or true
 end
