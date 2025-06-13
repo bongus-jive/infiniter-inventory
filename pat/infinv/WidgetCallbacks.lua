@@ -157,5 +157,5 @@ function Callbacks.tabSelected(tab, oldTab)
 end
 
 function Callbacks.quickMoveOutCheckbox()
-  ItemGrid:setShiftHeld(widget.getChecked("quickMoveOutCheckbox"))
+  ItemGrid:setQuickMove(widget.getChecked("quickMoveOutCheckbox"))
 end
