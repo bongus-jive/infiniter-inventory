@@ -38,6 +38,8 @@ function init()
 end
 
 function update()
+  PageBar:update()
+
   local item = player.swapSlotItem()
 
   if item and not HadSwapItem and not BlockQuickMoveIn and widget.getChecked("quickMoveCheckbox") and TabList:getSelected() then
