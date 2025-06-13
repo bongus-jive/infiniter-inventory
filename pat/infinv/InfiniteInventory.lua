@@ -40,7 +40,7 @@ end
 function update()
   local item = player.swapSlotItem()
 
-  if item and not HadSwapItem and not BlockQuickMoveIn and widget.getChecked("quickMoveInCheckbox") and TabList:getSelected() then
+  if item and not HadSwapItem and not BlockQuickMoveIn and widget.getChecked("quickMoveCheckbox") and TabList:getSelected() then
     local remainder = ItemGrid:addItem(item)
     player.setSwapSlotItem(remainder)
   end
