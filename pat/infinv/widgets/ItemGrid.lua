@@ -27,6 +27,7 @@ function ItemGridWidget:init()
     slot.name = fmt("%s.%s", self.widgetName, slot.id)
     slot.itemSlot = fmt("%s.slot", slot.name)
     slot.countLabel = fmt("%s.count", slot.name)
+    slot.backingImage = fmt("%s.backing", slot.name)
     self.slots[i] = slot
     widget.setData(slot.itemSlot, slot.index)
   end
@@ -345,4 +346,10 @@ function ItemGridWidget:quickStack()
   end
 
   if hasStacked then self:setItems(items) end
+end
+
+function ItemGridWidget:setBackingImage(image)
+  for i = 1, self.slotCount do
+    widget.setImage(self.slots[i].backingImage, image)
+  end
 end
