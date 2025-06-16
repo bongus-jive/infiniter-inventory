@@ -11,9 +11,6 @@ function Callbacks.moveTabButton(_, offset)
   tab:move(tab.index + offset)
 
   updateWidgets()
-  for _, tab in pairs(TabList.tabs) do
-    updateTabIcon(tab)
-  end
 end
 
 function Callbacks.deleteTabButton()

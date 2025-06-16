@@ -97,6 +97,10 @@ function TabItem:init()
       self:initChild(name)
     end
   end
+
+  if self.icon then
+    self:setIcon(self.icon[1], self.icon[2])
+  end
 end
 
 function TabItem:initChild(name)
@@ -141,9 +145,10 @@ end
 
 function TabItem:setIcon(image, rotation)
   widget.removeChild(self.widgetName, "icon")
+  self.icon = nil
 
   if not image then return end
-
+  
   local iconConfig = {
     rotation = rotation,
     [type(image) == "string" and "file" or "drawables"] = image
@@ -151,4 +156,5 @@ function TabItem:setIcon(image, rotation)
   iconConfig = sb.jsonMerge(self.parent.data.iconTemplate, iconConfig)
   
   widget.addChild(self.widgetName, iconConfig, "icon")
+  self.icon = {image, rotation}
 end
