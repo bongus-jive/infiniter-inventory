@@ -5,6 +5,7 @@ require "/pat/infinv/widgets/ItemGrid.lua"
 require "/pat/infinv/widgets/IconPicker.lua"
 require "/pat/infinv/widgets/ScrollInput.lua"
 require "/pat/infinv/widgets/PageBar.lua"
+require "/pat/infinv/widgets/OptionSpinner.lua"
 
 InvData = VJsonTuah:new("pat-infiniteinventory")
 TabList = TabListWidget:new("tabs.list", Callbacks.tabSelected)
@@ -12,6 +13,7 @@ ItemGrid = ItemGridWidget:new("gridLayout.slots", Callbacks.gridSlotChanged)
 IconPicker = IconPickerWidget:new("editorLayout.settings.iconList", Callbacks.tabIconSlot)
 PageScroller = ScrollInputWidget:new("gridLayout.pageScroller", Callbacks.pageScrolling)
 PageBar = PageBarWidget:new("gridLayout.pageBar")
+BorderSpinner = OptionSpinnerWidget:new("editorLayout.settings.borderSpinner", Callbacks.borderSpinner)
 
 local fmt = string.format
 
@@ -21,6 +23,7 @@ function init()
   IconPicker:init()
   PageScroller:init()
   PageBar:init()
+  BorderSpinner:init()
 
   local cfg = config.getParameter
   Strings = cfg("strings", {})
@@ -158,13 +161,13 @@ function updateWidgets()
   PageBar:set(pageIndex, maxPages)
 end
 
-function updateTitle()
+function updateSubtitle()
   local tab = TabList:getSelected()
   local subtitle = ""
   if tab then
     subtitle = tab.data.label or string.format(Strings.defaultTabSubtitle, tab.index)
   end
-  pane.setTitle(Strings.title, subtitle)
+  widget.setText("subtitleText", subtitle)
 end
 
 function updateTabIcon(tab)

@@ -119,7 +119,7 @@ function Callbacks.tabLabelTextbox()
     jremove(tab.data, "label")
   end
 
-  updateTitle()
+  updateSubtitle()
 end
 
 function Callbacks.tabLabelBlur(name)
@@ -139,7 +139,7 @@ function Callbacks.tabSelected(tab, oldTab)
   
   local label = tab and tab.data.label or ""
   widget.setText("editorLayout.settings.labelTextbox", label)
-  updateTitle()
+  updateSubtitle()
 
   if not tab then
     ItemGrid:clearItems()
@@ -153,9 +153,19 @@ function Callbacks.tabSelected(tab, oldTab)
   local pageIndex = math.max(1, math.min(tab.data.pageIndex, #tab.data.pages))
   ItemGrid:setItems(tab.data.pages[pageIndex])
 
+  BorderSpinner:set(tab.data.borderIndex)
   updateWidgets()
 end
 
 function Callbacks.quickMoveCheckbox()
   ItemGrid:setQuickMove(widget.getChecked("quickMoveCheckbox"))
+end
+
+function Callbacks.borderSpinner(index, option)
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  tab.data.borderIndex = index
+  widget.setImage("border", option:gsub("<frame>", "border"))
+  widget.setImage(BorderSpinner.widgetName..".icon", option:gsub("<frame>", "icon"))
 end
