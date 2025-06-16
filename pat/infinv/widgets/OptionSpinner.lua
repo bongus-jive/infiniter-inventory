@@ -11,10 +11,8 @@ end
 
 function OptionSpinnerWidget:init()
   self.data = widget.getData(self.widgetName) or {}
-
-  for name, cfg in pairs(self.data.children or {}) do
-    widget.addChild(self.widgetName, cfg, name)
-  end
+  self.btnUp = fmt("%s.up", self.widgetName)
+  self.btnDown = fmt("%s.down", self.widgetName)
 
   self.options = self.data.options
   if type(self.options) == "string" then
@@ -35,4 +33,9 @@ end
 function OptionSpinnerWidget:set(index)
   self.index = math.max(1, math.min(index or 1, self.maxIndex))
   self.callback(self.index, self.options[self.index])
+end
+
+function OptionSpinnerWidget:setEnabled(enabled)
+  widget.setButtonEnabled(self.btnUp, enabled)
+  widget.setButtonEnabled(self.btnDown, enabled)
 end

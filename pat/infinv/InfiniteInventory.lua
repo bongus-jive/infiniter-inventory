@@ -11,9 +11,10 @@ InvData = VJsonTuah:new("pat-infiniteinventory")
 TabList = TabListWidget:new("tabs.list", Callbacks.tabSelected)
 ItemGrid = ItemGridWidget:new("gridLayout.slots", Callbacks.gridSlotChanged)
 IconPicker = IconPickerWidget:new("editorLayout.settings.iconList", Callbacks.tabIconSlot)
+BorderSpinner = OptionSpinnerWidget:new("editorLayout.settings.borderSpinner", Callbacks.borderSelect)
+BackingSpinner = OptionSpinnerWidget:new("editorLayout.settings.backingSpinner", Callbacks.backingSelect)
 PageScroller = ScrollInputWidget:new("gridLayout.pageScroller", Callbacks.pageScrolling)
 PageBar = PageBarWidget:new("gridLayout.pageBar")
-BorderSpinner = OptionSpinnerWidget:new("editorLayout.settings.borderSpinner", Callbacks.borderSpinner)
 
 local fmt = string.format
 
@@ -21,9 +22,10 @@ function init()
   TabList:init()
   ItemGrid:init()
   IconPicker:init()
+  BorderSpinner:init()
+  BackingSpinner:init()
   PageScroller:init()
   PageBar:init()
-  BorderSpinner:init()
 
   local cfg = config.getParameter
   Strings = cfg("strings", {})
@@ -148,6 +150,9 @@ function updateWidgets()
   widget.setButtonEnabled("editorLayout.settings.moveTabUpButton", hasTab and tab.index ~= 1)
   widget.setButtonEnabled("editorLayout.settings.moveTabDownButton", hasTab and tab.index ~= tabCount)
   widget.setButtonEnabled("editorLayout.settings.deleteTabButton", hasTab and tabCount > 1 and not tabHasItems)
+
+  BorderSpinner:setEnabled(hasTab)
+  BackingSpinner:setEnabled(hasTab)
 
   local maxPages = pageCount
   if tab then

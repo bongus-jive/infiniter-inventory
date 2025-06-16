@@ -154,6 +154,7 @@ function Callbacks.tabSelected(tab, oldTab)
   ItemGrid:setItems(tab.data.pages[pageIndex])
 
   BorderSpinner:set(tab.data.borderIndex)
+  BackingSpinner:set(tab.data.backingIndex)
   updateWidgets()
 end
 
@@ -161,11 +162,20 @@ function Callbacks.quickMoveCheckbox()
   ItemGrid:setQuickMove(widget.getChecked("quickMoveCheckbox"))
 end
 
-function Callbacks.borderSpinner(index, option)
+function Callbacks.borderSelect(index, option)
   local tab = TabList:getSelected()
   if not tab then return end
 
   tab.data.borderIndex = index
   widget.setImage("border", option:gsub("<frame>", "border"))
   widget.setImage(BorderSpinner.widgetName..".icon", option:gsub("<frame>", "icon"))
+end
+
+function Callbacks.backingSelect(index, option)
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  tab.data.backingIndex = index
+  ItemGrid:setBackingImage(option)
+  widget.setImage(BackingSpinner.widgetName..".icon", option)
 end
