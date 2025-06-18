@@ -100,14 +100,14 @@ function uninit()
 end
 
 function save()
-  local tab = TabList:getSelected()
-  if tab then
-    saveCurrentPage(tab)
-    tab.data.selected = true
-  end
-
   local tabs = jarray()
   for i, tab in ipairs(TabList.tabs) do
+    jremove(tab.data, "selected")
+    if tab:isSelected() then
+      tab.data.selected = true
+      saveCurrentPage(tab)
+    end
+    
     tabs[i] = tab.data
   end
 
