@@ -37,6 +37,10 @@ function Callbacks.quickStackbutton()
   ItemGrid:quickStack()
 end
 
+function Callbacks.quickMoveCheckbox()
+  ItemGrid:setQuickMove(widget.getChecked("quickMoveCheckbox"))
+end
+
 function Callbacks.tabConfigCheckbox()
   updateWidgets()
 end
@@ -71,7 +75,7 @@ function Callbacks.pageScrolling(up)
 end
 
 -- tab icons
-function Callbacks.tabIconSelected()
+function Callbacks.tabIconSelect()
   local tab = TabList:getSelected()
   if not tab then return end
 
@@ -144,35 +148,31 @@ function Callbacks.tabSelected(tab, oldTab)
     return
   end
 
-  IconPicker:setSelected(tab.data.iconIndex or 1)
+  IconPicker:setSelected(tab.data.iconIndex)
   IconPicker:setIconSlotItem(tab.data.iconItem)
+
+  BorderPicker:setSelected(tab.data.borderIndex)
+  BackingPicker:setSelected(tab.data.backingIndex)
 
   local pageIndex = math.max(1, math.min(tab.data.pageIndex, #tab.data.pages))
   ItemGrid:setItems(tab.data.pages[pageIndex])
-
-  BorderSpinner:set(tab.data.borderIndex)
-  BackingSpinner:set(tab.data.backingIndex)
   updateWidgets()
 end
 
-function Callbacks.quickMoveCheckbox()
-  ItemGrid:setQuickMove(widget.getChecked("quickMoveCheckbox"))
-end
-
-function Callbacks.borderSelect(index, option)
+function Callbacks.tabBorderSelect()
   local tab = TabList:getSelected()
   if not tab then return end
 
-  tab.data.borderIndex = index
-  widget.setImage("border", option:gsub("<frame>", "border"))
-  widget.setImage(BorderSpinner.widgetName..".icon", option:gsub("<frame>", "icon"))
+  tab.data.borderIndex = BorderPicker:getSelected()
+  local image = BorderPicker:getImage(tab.data.borderIndex)
+  widget.setImage("border", image)
 end
 
-function Callbacks.backingSelect(index, option)
+function Callbacks.tabBackingSelect()
   local tab = TabList:getSelected()
   if not tab then return end
 
-  tab.data.backingIndex = index
-  ItemGrid:setBackingImage(option)
-  widget.setImage(BackingSpinner.widgetName..".icon", option)
+  tab.data.backingIndex = BackingPicker:getSelected()
+  local image = BackingPicker:getImage(tab.data.backingIndex)
+  ItemGrid:setBackingImage(image)
 end

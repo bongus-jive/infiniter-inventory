@@ -16,7 +16,7 @@ function TabListWidget:init()
   self.data = widget.getData(self.widgetName) or {}
   self:clear()
 
-  self._selectCallback = function()
+  self._select = function()
     if self._skipSelectCallback then return end
 
     local oldTab = self.selectedTab

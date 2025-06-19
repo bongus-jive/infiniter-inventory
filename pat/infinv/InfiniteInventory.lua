@@ -2,17 +2,17 @@ require "/pat/infinv/WidgetCallbacks.lua"
 require "/pat/infinv/VJsonTuah.lua"
 require "/pat/infinv/widgets/TabList.lua"
 require "/pat/infinv/widgets/ItemGrid.lua"
+require "/pat/infinv/widgets/ImagePicker.lua"
 require "/pat/infinv/widgets/IconPicker.lua"
 require "/pat/infinv/widgets/ScrollInput.lua"
 require "/pat/infinv/widgets/PageBar.lua"
-require "/pat/infinv/widgets/OptionSpinner.lua"
 
 InvData = VJsonTuah:new("pat-infiniteinventory")
 TabList = TabListWidget:new("tabs.list", Callbacks.tabSelected)
 ItemGrid = ItemGridWidget:new("gridLayout.slots", Callbacks.gridSlotChanged)
-IconPicker = IconPickerWidget:new("editorLayout.settings.iconList", Callbacks.tabIconSlot)
-BorderSpinner = OptionSpinnerWidget:new("editorLayout.settings.borderSpinner", Callbacks.borderSelect)
-BackingSpinner = OptionSpinnerWidget:new("editorLayout.settings.backingSpinner", Callbacks.backingSelect)
+IconPicker = IconPickerWidget:new("editorLayout.editorTabs.tabs.icon.scrollArea.list", Callbacks.tabIconSlot)
+BorderPicker = ImagePickerWidget:new("editorLayout.editorTabs.tabs.border.scrollArea.list")
+BackingPicker = ImagePickerWidget:new("editorLayout.editorTabs.tabs.backing.scrollArea.list")
 PageScroller = ScrollInputWidget:new("gridLayout.pageScroller", Callbacks.pageScrolling)
 PageBar = PageBarWidget:new("gridLayout.pageBar")
 
@@ -22,8 +22,8 @@ function init()
   TabList:init()
   ItemGrid:init()
   IconPicker:init()
-  BorderSpinner:init()
-  BackingSpinner:init()
+  BorderPicker:init()
+  BackingPicker:init()
   PageScroller:init()
   PageBar:init()
 
@@ -150,9 +150,6 @@ function updateWidgets()
   widget.setButtonEnabled("editorLayout.settings.moveTabUpButton", hasTab and tab.index ~= 1)
   widget.setButtonEnabled("editorLayout.settings.moveTabDownButton", hasTab and tab.index ~= tabCount)
   widget.setButtonEnabled("editorLayout.settings.deleteTabButton", hasTab and tabCount > 1 and not tabHasItems)
-
-  BorderSpinner:setEnabled(hasTab)
-  BackingSpinner:setEnabled(hasTab)
 
   local maxPages = pageCount
   if tab then
