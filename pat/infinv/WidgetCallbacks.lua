@@ -109,7 +109,7 @@ end
 
 --tab label
 function Callbacks.tabLabelTextbox()
-  local text = widget.getText("editorLayout.settings.labelTextbox")
+  local text = widget.getText("editorLayout.labelTextbox")
   
   local tab = TabList:getSelected()
   if not tab then return end
@@ -124,7 +124,7 @@ function Callbacks.tabLabelTextbox()
 end
 
 function Callbacks.tabLabelBlur(name)
-  widget.blur("editorLayout.settings." .. name)
+  widget.blur("editorLayout." .. name)
 end
 
 -- the rest
@@ -139,7 +139,7 @@ function Callbacks.tabSelected(tab, oldTab)
   end
   
   local label = tab and tab.data.label or ""
-  widget.setText("editorLayout.settings.labelTextbox", label)
+  widget.setText("editorLayout.labelTextbox", label)
   updateSubtitle()
 
   if not tab then

@@ -147,9 +147,9 @@ function updateWidgets()
   widget.setButtonEnabled("gridLayout.prevPageButton", hasTab and pageIndex > 1)
   widget.setButtonEnabled("gridLayout.nextPageButton", hasTab and (pageIndex < pageCount or gridHasItems))
 
-  widget.setButtonEnabled("editorLayout.settings.moveTabUpButton", hasTab and tab.index ~= 1)
-  widget.setButtonEnabled("editorLayout.settings.moveTabDownButton", hasTab and tab.index ~= tabCount)
-  widget.setButtonEnabled("editorLayout.settings.deleteTabButton", hasTab and tabCount > 1 and not tabHasItems)
+  widget.setButtonEnabled("editorLayout.moveTabUpButton", hasTab and tab.index ~= 1)
+  widget.setButtonEnabled("editorLayout.moveTabDownButton", hasTab and tab.index ~= tabCount)
+  widget.setButtonEnabled("editorLayout.deleteTabButton", hasTab and tabCount > 1 and not tabHasItems)
 
   local maxPages = pageCount
   if tab then
