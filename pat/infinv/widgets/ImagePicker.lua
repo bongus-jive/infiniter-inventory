@@ -26,6 +26,7 @@ end
 function ImagePickerWidget:buildList()
   for i, image in ipairs(self.images) do
     self:addItem(i, image)
+    self.images[i] = image:gsub("<frame>", "base")
   end
 end
 
@@ -57,5 +58,5 @@ function ImagePickerWidget:setSelected(index)
 end
 
 function ImagePickerWidget:getImage(index, item)
-  return (self.images[index] or ""):gsub("<frame>", "base")
+  return self.images[index] or ""
 end
