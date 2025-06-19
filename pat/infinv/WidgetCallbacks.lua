@@ -71,7 +71,7 @@ function Callbacks.changePage(_, offset)
 end
 
 function Callbacks.pageScrolling(up)
-  Callbacks.changePage(nil, up and 1 or -1)
+  Callbacks.changePage(nil, up and -1 or 1)
 end
 
 -- tab icons
