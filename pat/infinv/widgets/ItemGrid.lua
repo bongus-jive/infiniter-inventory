@@ -54,7 +54,12 @@ function ItemGridWidget:setSlotItem(slot, item, skipCallback)
   if self.callback and not skipCallback then self.callback(slot) end
 
   widget.setVisible(slot.countLabel, item ~= nil)
-  if not item then return end
+  if item then
+    widget.setVisible(slot.backingImage, self.data.showBackingImageWhenFull or false)
+  else
+    widget.setVisible(slot.backingImage, self.data.showBackingImageWhenEmpty or true)
+    return
+  end
 
   local count = self:countToString(item.count)
   widget.setText(slot.countLabel, count)
