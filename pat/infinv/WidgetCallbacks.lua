@@ -33,7 +33,7 @@ function Callbacks.sortButton()
   ItemGrid:sort()
 end
 
-function Callbacks.quickStackbutton()
+function Callbacks.quickStackButton()
   ItemGrid:quickStack()
 end
 
