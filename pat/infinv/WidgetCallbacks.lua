@@ -2,7 +2,7 @@ Callbacks = {}
 
 -- footer buttons
 function Callbacks.newTabButton()
-  createNewTab():select()
+  createTab():select()
 end
 
 function Callbacks.moveTabButton(_, offset)
@@ -129,8 +129,8 @@ end
 
 -- the rest
 function Callbacks.gridSlotChanged(slot)
-  updateWidgets()
   save()
+  updateWidgets()
 end
 
 function Callbacks.tabSelected(tab, oldTab)

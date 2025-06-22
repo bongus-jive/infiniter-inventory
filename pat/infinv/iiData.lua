@@ -1,13 +1,6 @@
-VJsonTuah = {}
+iiData = {ID = "pat-infiniteinventory"}
 
-function VJsonTuah:new(id)
-  local new = {}
-  setmetatable(new, {__index = self})
-  new.ID = id
-  return new
-end
-
-function VJsonTuah:load()
+function iiData:load()
   local vJson = player.getProperty(self.ID)
   if vJson then
     return root.loadVersionedJson(vJson, self.ID)
@@ -15,7 +8,7 @@ function VJsonTuah:load()
   return {}
 end
 
-function VJsonTuah:save(data)
+function iiData:save(data)
   local vJson = root.makeCurrentVersionedJson(self.ID, data)
   player.setProperty(self.ID, vJson)
 end

@@ -1,5 +1,5 @@
 require "/pat/infinv/WidgetCallbacks.lua"
-require "/pat/infinv/VJsonTuah.lua"
+require "/pat/infinv/iiData.lua"
 require "/pat/infinv/widgets/TabList.lua"
 require "/pat/infinv/widgets/ItemGrid.lua"
 require "/pat/infinv/widgets/ImagePicker.lua"
@@ -7,8 +7,7 @@ require "/pat/infinv/widgets/IconPicker.lua"
 require "/pat/infinv/widgets/ScrollInput.lua"
 require "/pat/infinv/widgets/PageBar.lua"
 
-InvData = VJsonTuah:new("pat-infiniteinventory")
-TabList = TabListWidget:new("tabs.list", Callbacks.tabSelected)
+TabList = TabListWidget:new("bagTabs.list", Callbacks.tabSelected)
 ItemGrid = ItemGridWidget:new("gridLayout.slots", Callbacks.gridSlotChanged)
 IconPicker = IconPickerWidget:new("editorLayout.editorTabs.tabs.icon.scrollArea.list", Callbacks.tabIconSlot)
 BorderPicker = ImagePickerWidget:new("editorLayout.editorTabs.tabs.border.scrollArea.list")
@@ -27,16 +26,15 @@ function init()
   PageScroller:init()
   PageBar:init()
 
-  local cfg = config.getParameter
-  Strings = cfg("strings", {})
+  Strings = config.getParameter("strings", {})
   Strings.tooltips = Strings.tooltips or {}
-  
-  local data = InvData:load()
+
+  local data = iiData:load()
   for _, tabData in ipairs(data) do
-    createNewTab(tabData)
+    createTab(tabData)
   end
 
-  if #TabList.tabs == 0 then createNewTab():select() end
+  if #TabList.tabs == 0 then createTab():select() end
   if not TabList:getSelected() then TabList.tabs[1]:select() end
 
   updateWidgets()
@@ -111,7 +109,7 @@ function save()
     tabs[i] = tab.data
   end
 
-  InvData:save(tabs)
+  iiData:save(tabs)
 end
 
 function saveCurrentPage(tab)
@@ -124,50 +122,41 @@ end
 
 function updateWidgets()
   local tab = TabList:getSelected()
-  local hasTab = tab ~= nil
-  local tabCount = #TabList.tabs
-  local pageIndex = tab and tab.data.pageIndex or 0
-  local pageCount = tab and #tab.data.pages or 0
 
-  local gridHasItems = ItemGrid:hasItems()
-  local tabHasItems = gridHasItems
-  if not tabHasItems and pageCount > 1 then
-    for _, page in pairs(tab.data.pages) do
-      if next(page) then tabHasItems = true break end
-    end
+  local editorEnabled = tab and widget.getChecked("tabConfigCheckbox")
+  local gridEnabled = tab and not editorEnabled
+  widget.setVisible("gridLayout", gridEnabled)
+  widget.setVisible("editorLayout", editorEnabled)
+  widget.setButtonEnabled("sortButton", gridEnabled)
+  widget.setButtonEnabled("quickStackButton", gridEnabled)
+  widget.setButtonEnabled("quickMoveCheckbox", gridEnabled)
+
+  if not tab then return end
+  local pages = tab.data.pages or {}
+  local pageIndex, pageCount = tab.data.pageIndex or 0, #pages
+
+  if next(pages[#pages]) then pageCount = pageCount + 1 end
+
+  local tabHasItems = false
+  for _, items in pairs(pages) do
+    if next(items) then tabHasItems = true break end
   end
 
-  local editMode = hasTab and widget.getChecked("tabConfigCheckbox")
-  widget.setVisible("gridLayout", hasTab and not editMode)
-  widget.setVisible("editorLayout", editMode)
-
-  widget.setButtonEnabled("tabConfigCheckbox", hasTab)
-  widget.setButtonEnabled("sortButton", hasTab and not editMode)
-  widget.setButtonEnabled("quickStackButton", hasTab and not editMode)
-  widget.setButtonEnabled("gridLayout.prevPageButton", hasTab and pageIndex > 1)
-  widget.setButtonEnabled("gridLayout.nextPageButton", hasTab and (pageIndex < pageCount or gridHasItems))
-
-  widget.setButtonEnabled("editorLayout.moveTabUpButton", hasTab and tab.index ~= 1)
-  widget.setButtonEnabled("editorLayout.moveTabDownButton", hasTab and tab.index ~= tabCount)
-  widget.setButtonEnabled("editorLayout.deleteTabButton", hasTab and tabCount > 1 and not tabHasItems)
-
-  local maxPages = pageCount
-  if tab then
-    if pageIndex == pageCount then
-      if gridHasItems then maxPages = maxPages + 1 end
-    elseif next(tab.data.pages) then
-      maxPages = maxPages + 1
-    end
-  end
-  widget.setText("gridLayout.pageLabel", tab and fmt(Strings.pageText, pageIndex, maxPages) or "")
-  PageBar:set(pageIndex, maxPages)
+  PageBar:set(pageIndex, pageCount)
+  widget.setText("gridLayout.pageLabel", fmt(Strings.pageText, pageIndex, pageCount))
+  
+  widget.setButtonEnabled("gridLayout.prevPageButton", pageIndex > 1)
+  widget.setButtonEnabled("gridLayout.nextPageButton", pageIndex < pageCount)
+  widget.setButtonEnabled("editorLayout.moveTabUpButton", tab.index ~= 1)
+  widget.setButtonEnabled("editorLayout.moveTabDownButton", tab.index ~= #TabList.tabs)
+  widget.setButtonEnabled("editorLayout.deleteTabButton", not tabHasItems)
 end
 
 function updateSubtitle()
   local tab = TabList:getSelected()
   local subtitle = ""
   if tab then
-    subtitle = tab.data.label or string.format(Strings.defaultTabSubtitle, tab.index)
+    subtitle = tab.data.label or fmt(Strings.defaultTabSubtitle, tab.index)
   end
   widget.setText("subtitleText", subtitle)
 end
@@ -182,7 +171,7 @@ function updateTabIcon(tab)
   tab:setIcon(image, rot)
 end
 
-function createNewTab(data)
+function createTab(data)
   local tab = TabList:newTab(data)
   data = tab.data
 
