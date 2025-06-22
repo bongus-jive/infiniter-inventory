@@ -202,17 +202,27 @@ function ItemGridWidget:setQuickMove(v)
   self.quickMove = v
 end
 
+local suffixes = {
+  {"Q", 1e18},
+  {"q", 1e15},
+  {"t", 1e12},
+  {"b", 1e9},
+  {"m", 1e6},
+  {"k", 1000, 2000}
+}
+
 function ItemGridWidget:countToString(num)
   if not num or num == 1 then return "" end
 
-  if num >= 10e6 then
-    return fmt("%dm", math.floor(num / 10e5))
-  elseif num >= 10e5 then
-    return fmt("%.1fm", num / 10e5)
-  elseif num >= 10e3 then
-    return fmt("%dk", math.floor(num / 10e2))
-  elseif num > 10e2 then
-    return fmt("%.1fk", num / 10e2)
+  for _, slop in ipairs(suffixes) do
+    local suffix, divisor = slop[1], slop[2]
+    local min = slop[3] or divisor
+    if num >= min then
+      if num >= divisor * 10 then
+        return fmt("%d%s", math.floor(num / divisor), suffix)
+      end
+      return fmt("%.1f%s", num / divisor, suffix)
+    end
   end
 
   return tostring(num)
