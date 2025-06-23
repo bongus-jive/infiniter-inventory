@@ -88,7 +88,7 @@ function Callbacks.tabIconSlot(item)
   if not tab then return end
 
   jremove(tab.data, "iconItem")
-  if item then tab.data.iconItem = item end
+  if item then tab.data.iconItem = {name = item.name, parameters = item.parameters} end
   updateTabIcon(tab)
 end
 
