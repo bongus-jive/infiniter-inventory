@@ -159,7 +159,7 @@ function updateSubtitle()
   if tab then
     subtitle = tab.data.label or fmt(Strings.defaultTabSubtitle, tab.index)
   end
-  widget.setText("subtitleText", subtitle)
+  widget.setText("subtitleText", fmt("^shadow;%s", subtitle))
 end
 
 function updateTabIcon(tab)
