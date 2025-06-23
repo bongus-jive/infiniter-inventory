@@ -1,5 +1,4 @@
 require "/pat/infinv/WidgetCallbacks.lua"
-require "/pat/infinv/iiData.lua"
 require "/pat/infinv/widgets/TabList.lua"
 require "/pat/infinv/widgets/ItemGrid.lua"
 require "/pat/infinv/widgets/ImagePicker.lua"
@@ -29,7 +28,8 @@ function init()
   Strings = config.getParameter("strings", {})
   Strings.tooltips = Strings.tooltips or {}
 
-  local data = iiData:load()
+  local vJson = player.getProperty("pat-infiniteinventory")
+  local data = vJson and root.loadVersionedJson(vJson, "pat-infiniteinventory") or {}
   for _, tabData in ipairs(data) do
     createTab(tabData)
   end
@@ -109,7 +109,8 @@ function save()
     tabs[i] = tab.data
   end
 
-  iiData:save(tabs)
+  local vJson = root.makeCurrentVersionedJson("pat-infiniteinventory", tabs)
+  player.setProperty("pat-infiniteinventory", vJson)
 end
 
 function saveCurrentPage(tab)
