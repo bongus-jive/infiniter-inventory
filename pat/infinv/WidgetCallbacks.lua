@@ -98,9 +98,8 @@ function Callbacks.tabIconRotateButton()
 
   local rot = tab.data.iconRotation or 360
   rot = rot - 90
-  if rot <= 0 then
-    jremove(tab.data, "iconRotation")
-  else
+  jremove(tab.data, "iconRotation")
+  if rot > 0 then
     tab.data.iconRotation = rot
   end
 
@@ -114,10 +113,9 @@ function Callbacks.tabLabelTextbox()
   local tab = TabList:getSelected()
   if not tab then return end
   
+  jremove(tab.data, "label")
   if text and text:len() > 0 then
     tab.data.label = text
-  else
-    jremove(tab.data, "label")
   end
 
   updateSubtitle()
@@ -163,16 +161,22 @@ function Callbacks.tabBorderSelect()
   local tab = TabList:getSelected()
   if not tab then return end
 
-  tab.data.borderIndex = BorderPicker:getSelected()
-  local image = BorderPicker:getImage(tab.data.borderIndex)
+  local index = BorderPicker:getSelected()
+  local image = BorderPicker:getImage(index)
   widget.setImage("border", image)
+
+  jremove(tab.data, "borderIndex")
+  if index ~= 1 then tab.data.borderIndex = index end
 end
 
 function Callbacks.tabBackingSelect()
   local tab = TabList:getSelected()
   if not tab then return end
 
-  tab.data.backingIndex = BackingPicker:getSelected()
-  local image = BackingPicker:getImage(tab.data.backingIndex)
+  local index = BackingPicker:getSelected()
+  local image = BackingPicker:getImage(index)
   ItemGrid:setBackingImage(image)
+  
+  jremove(tab.data, "backingIndex")
+  if index ~= 1 then tab.data.backingIndex = index end
 end
