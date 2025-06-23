@@ -121,11 +121,11 @@ function Callbacks.tabLabelTextbox()
   updateSubtitle()
 end
 
-function Callbacks.tabLabelBlur(name)
-  widget.blur("editorLayout." .. name)
+-- the rest
+function Callbacks.blur()
+  widget.focus("_blur"); widget.blur("_blur")
 end
 
--- the rest
 function Callbacks.gridSlotChanged(slot)
   save()
   updateWidgets()
