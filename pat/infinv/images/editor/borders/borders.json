@@ -9,6 +9,6 @@
   "/pat/infinv/images/editor/borders/base.png:<frame>?replace;1A510E=85734F;1A2D17F0=4F432CE6",
   "/pat/infinv/images/editor/borders/base.png:<frame>?replace;1A510E=756620;1A2D17F0=574B17F0",
   "/pat/infinv/images/editor/borders/base.png:<frame>?replace;1A510E=626262;1A2D17F0=2F2F2FEA",
-  "/pat/infinv/images/editor/borders/base.png:<frame>?replace;1A510E=FFFFFF;1A2D17F0=999999F0?multiply=<custom>",
+  "/pat/infinv/images/editor/borders/base.png:<frame>?replace;1A510E=FFFFFF;1A2D17F0=999999E6?multiply=<custom>",
   "/pat/infinv/images/editor/borders/base.png:<frame>?replace;1A510E=<custom>;1A2D17F0=2F2F2FEA"
 ]
