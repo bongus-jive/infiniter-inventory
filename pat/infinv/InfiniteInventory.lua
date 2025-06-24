@@ -129,13 +129,12 @@ end
 function updateWidgets()
   local tab = TabList:getSelected()
 
-  local editorEnabled = tab and widget.getChecked("tabConfigCheckbox")
-  local gridEnabled = tab and not editorEnabled
-  widget.setVisible("gridLayout", gridEnabled)
-  widget.setVisible("editorLayout", editorEnabled)
-  widget.setButtonEnabled("sortButton", gridEnabled)
-  widget.setButtonEnabled("quickStackButton", gridEnabled)
-  widget.setButtonEnabled("quickMoveCheckbox", gridEnabled)
+  local enabled = tab ~= nil
+  widget.setVisible("gridLayout", enabled)
+  widget.setVisible("editorLayout", enabled and widget.getChecked("tabConfigCheckbox"))
+  widget.setButtonEnabled("sortButton", enabled)
+  widget.setButtonEnabled("quickStackButton", enabled)
+  widget.setButtonEnabled("quickMoveCheckbox", enabled)
 
   if not tab then return end
   local pages = tab.data.pages or {}
