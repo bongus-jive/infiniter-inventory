@@ -28,7 +28,7 @@ function IconPickerWidget:getImage(index, item)
   if index == -1 then
     return self:getItemIcon(item)
   end
-  return ImagePickerWidget.getImage(self, index, item)
+  return ImagePickerWidget.getImage(self, index)
 end
 
 function IconPickerWidget:getIconSlotItem()

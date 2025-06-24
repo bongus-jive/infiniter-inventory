@@ -57,6 +57,6 @@ function ImagePickerWidget:setSelected(index)
   widget.setListSelected(self.widgetName, item.id)
 end
 
-function ImagePickerWidget:getImage(index, item)
+function ImagePickerWidget:getImage(index)
   return self.images[index] or ""
 end
