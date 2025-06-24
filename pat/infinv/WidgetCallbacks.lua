@@ -108,10 +108,10 @@ end
 
 --tab label
 function Callbacks.tabLabelTextbox()
-  local text = widget.getText("editorLayout.labelTextbox")
-  
   local tab = TabList:getSelected()
   if not tab then return end
+
+  local text = widget.getText("editorLayout.labelTextbox")
   
   jremove(tab.data, "label")
   if text and text:len() > 0 then
@@ -150,7 +150,12 @@ function Callbacks.tabSelected(tab, oldTab)
   IconPicker:setIconSlotItem(tab.data.iconItem)
 
   BorderPicker:setSelected(tab.data.borderIndex)
+  BorderColorbox:setText(tab.data.borderColor)
+  updateBorder()
+  
   BackingPicker:setSelected(tab.data.backingIndex)
+  BackingColorbox:setText(tab.data.backingColor)
+  updateBacking()
 
   local pageIndex = math.max(1, math.min(tab.data.pageIndex, #tab.data.pages))
   ItemGrid:setItems(tab.data.pages[pageIndex])
@@ -161,22 +166,36 @@ function Callbacks.tabBorderSelect()
   local tab = TabList:getSelected()
   if not tab then return end
 
-  local index = BorderPicker:getSelected()
-  local image = BorderPicker:getImage(index)
-  widget.setImage("border", image)
-
   jremove(tab.data, "borderIndex")
+  local index = BorderPicker:getSelected()
   if index ~= 1 then tab.data.borderIndex = index end
+  updateBorder()
 end
 
 function Callbacks.tabBackingSelect()
   local tab = TabList:getSelected()
   if not tab then return end
 
-  local index = BackingPicker:getSelected()
-  local image = BackingPicker:getImage(index)
-  ItemGrid:setBackingImage(image)
-  
   jremove(tab.data, "backingIndex")
+  local index = BackingPicker:getSelected()
   if index ~= 1 then tab.data.backingIndex = index end
+  updateBacking()
+end
+
+function Callbacks.tabBorderColor(color)
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  jremove(tab.data, "borderColor")
+  tab.data.borderColor = color
+  updateBorder()
+end
+
+function Callbacks.tabBackingColor(color)
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  jremove(tab.data, "backingColor")
+  tab.data.backingColor = color
+  updateBacking()
 end

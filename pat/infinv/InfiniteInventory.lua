@@ -5,12 +5,15 @@ require "/pat/infinv/widgets/ImagePicker.lua"
 require "/pat/infinv/widgets/IconPicker.lua"
 require "/pat/infinv/widgets/ScrollInput.lua"
 require "/pat/infinv/widgets/PageBar.lua"
+require "/pat/infinv/widgets/ColorTextbox.lua"
 
 TabList = TabListWidget:new("bagTabs.list", Callbacks.tabSelected)
 ItemGrid = ItemGridWidget:new("gridLayout.slots", Callbacks.gridSlotChanged)
 IconPicker = IconPickerWidget:new("editorLayout.editorTabs.tabs.icon.scrollArea.list", Callbacks.tabIconSlot)
 BorderPicker = ImagePickerWidget:new("editorLayout.editorTabs.tabs.border.scrollArea.list")
 BackingPicker = ImagePickerWidget:new("editorLayout.editorTabs.tabs.backing.scrollArea.list")
+BorderColorbox = ColorTextboxWidget:new("editorLayout.editorTabs.tabs.border.scrollArea.colorTextbox", Callbacks.tabBorderColor)
+BackingColorbox = ColorTextboxWidget:new("editorLayout.editorTabs.tabs.backing.scrollArea.colorTextbox", Callbacks.tabBackingColor)
 PageScroller = ScrollInputWidget:new("gridLayout.pageScroller", Callbacks.pageScrolling)
 PageBar = PageBarWidget:new("gridLayout.pageBar")
 
@@ -22,6 +25,8 @@ function init()
   IconPicker:init()
   BorderPicker:init()
   BackingPicker:init()
+  BorderColorbox:init()
+  BackingColorbox:init()
   PageScroller:init()
   PageBar:init()
 
@@ -170,6 +175,26 @@ function updateTabIcon(tab)
   if rot then rot = rot * (math.pi / 180) end
 
   tab:setIcon(image, rot)
+end
+
+function updateBorder()
+  local tab = TabList:getSelected()
+  if not tab then return end
+  
+  BorderPicker:setTag("custom", tab.data.borderColor or "FFF")
+  local index = tab.data.borderIndex or 1
+  local image = BorderPicker:getImage(index)
+  widget.setImage("border", image)
+end
+
+function updateBacking()
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  BackingPicker:setTag("custom", tab.data.backingColor or "FFF")
+  local index = tab.data.backingIndex or 1
+  local image = BackingPicker:getImage(index)
+  ItemGrid:setBackingImage(image)
 end
 
 function createTab(data)

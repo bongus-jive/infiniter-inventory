@@ -19,6 +19,9 @@ function ImagePickerWidget:init()
   widget.clearListItems(self.widgetName)
   self.items = {}
   self.itemIds = {}
+  
+  self.imageTags = self.data.tags or {}
+  self.iconTags = sb.jsonMerge(self.imageTags, self.data.iconTags)
 
   self:buildList()
 end
@@ -26,7 +29,6 @@ end
 function ImagePickerWidget:buildList()
   for i, image in ipairs(self.images) do
     self:addItem(i, image)
-    self.images[i] = image:gsub("<frame>", "base")
   end
 end
 
@@ -35,11 +37,17 @@ function ImagePickerWidget:addItem(index, image)
   item.id = widget.addListItem(self.widgetName)
   item.index = index
   item.name = fmt("%s.%s", self.widgetName, item.id)
+  item.iconName = fmt("%s.icon", item.name)
   widget.setData(fmt("%s.button", item.name), { parent = self.widgetName, index = index })
 
   if image then
-    local icon = fmt("%s.icon", item.name)
-    widget.setImage(icon, image:gsub("<frame>", "icon"))
+    item.baseImage = image
+    widget.setImage(item.iconName, sb.replaceTags(image, self.iconTags))
+
+    if self.data.specialTag and image:find(fmt("<%s>", self.data.specialTag)) then
+      widget.setVisible(fmt("%s.special", item.name), true)
+      item.special = true
+    end
   end
 
   self.items[index] = item
@@ -49,7 +57,8 @@ end
 
 function ImagePickerWidget:getSelected()
   local id = widget.getListSelected(self.widgetName)
-  return self.itemIds[id].index
+  local item = self.itemIds[id]
+  return item.index, item.special
 end
 
 function ImagePickerWidget:setSelected(index)
@@ -58,5 +67,17 @@ function ImagePickerWidget:setSelected(index)
 end
 
 function ImagePickerWidget:getImage(index)
-  return self.images[index] or ""
+  local image = self.images[index]
+  return image and sb.replaceTags(image, self.imageTags) or ""
+end
+
+function ImagePickerWidget:setTag(name, value, icon)
+  self.imageTags[name] = value
+  self.iconTags[name] = value
+
+  for _, item in pairs(self.items) do
+    if item.baseImage then
+      widget.setImage(item.iconName, sb.replaceTags(item.baseImage, self.iconTags))
+    end
+  end
 end
