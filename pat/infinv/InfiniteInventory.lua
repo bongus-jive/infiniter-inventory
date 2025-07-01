@@ -34,13 +34,20 @@ function init()
   Strings.tooltips = Strings.tooltips or {}
 
   local vJson = player.getProperty("pat-infiniteinventory")
-  local data = vJson and root.loadVersionedJson(vJson, "pat-infiniteinventory") or {}
-  for _, tabData in ipairs(data) do
-    createTab(tabData)
+  local invData = vJson and root.loadVersionedJson(vJson, "pat-infiniteinventory") or {}
+
+  local selectedTab
+  for _, tabData in ipairs(invData) do
+    local tab = createTab(tabData)
+
+    if tabData.selected then selectedTab = tab end
+    jremove(tabData, "selected")
   end
 
-  if #TabList.tabs == 0 then createTab():select() end
-  if not TabList:getSelected() then TabList.tabs[1]:select() end
+  if not selectedTab then
+    selectedTab = TabList.tabs[1] or createTab()
+  end
+  selectedTab:select()
 
   updateWidgets()
 end
@@ -199,9 +206,6 @@ end
 function createTab(data)
   local tab = TabList:newTab(data)
   data = tab.data
-
-  if data.selected then tab:select() end
-  jremove(data, "selected")
 
   if not data.pages then data.pages = jarray() end
   if not data.pages[1] then data.pages[1] = jarray() end
