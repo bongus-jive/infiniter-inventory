@@ -44,12 +44,13 @@ end
 
 function ItemGridWidget:getSlotItem(slot)
   if not slot then return end
-  return widget.itemSlotItem(slot.itemSlot)
+  return slot.item
 end
 
 function ItemGridWidget:setSlotItem(slot, item, skipCallback)
   if self:isItemEmpty(item) then item = nil end
   widget.setItemSlotItem(slot.itemSlot, item)
+  slot.item = item
 
   if self.callback and not skipCallback then self.callback(slot) end
 
