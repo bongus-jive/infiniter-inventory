@@ -58,14 +58,14 @@ end
 function update()
   PageBar:update()
 
-  local item = player.swapSlotItem()
-
-  if item and not HadSwapItem and not BlockQuickMoveIn and widget.getChecked("quickMoveCheckbox") and TabList:getSelected() then
-    local remainder = ItemGrid:addItem(item)
-    player.setSwapSlotItem(remainder)
+  if not BlockQuickMoveIn and widget.getChecked("quickMoveCheckbox") and TabList:getSelected() then
+    local item = player.swapSlotItem()
+    if item then
+      local remainder = ItemGrid:addItem(item)
+      player.setSwapSlotItem(remainder)
+    end
   end
 
-  HadSwapItem = item ~= nil
   BlockQuickMoveIn = false
 end
 
