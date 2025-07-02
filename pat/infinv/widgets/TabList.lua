@@ -18,11 +18,14 @@ function TabListWidget:init()
 
   self._select = function()
     if self._skipSelectCallback then return end
+    
+    local id = widget.getListSelected(self.widgetName)
 
     local oldTab = self.selectedTab
-    local newTab = self:getSelected()
+    self.selectedTab = self.tabs[id]
+
     if self.callback then
-      self.callback(newTab, oldTab)
+      self.callback(self.selectedTab, oldTab)
     end
   end
 end
@@ -53,19 +56,7 @@ function TabListWidget:reindex(start)
 end
 
 function TabListWidget:getSelected()
-  local id = widget.getListSelected(self.widgetName)
-  self.selectedTab = self.tabs[id]
   return self.selectedTab
-end
-
-function TabListWidget:deselect()
-  if not widget.getListSelected(self.widgetName) then return end
-
-  self._skipSelectCallback = true
-  local new = widget.addListItem(self.widgetName)
-  widget.setListSelected(self.widgetName, new)
-  widget.removeListItem(self.widgetName, #self.tabs)
-  self._skipSelectCallback = false
 end
 
 function TabListWidget:newTab(data)
@@ -137,10 +128,6 @@ end
 function TabItem:select()
   widget.setListSelected(self.parent.widgetName, self.id)
   self.parent.selectedTab = self
-end
-
-function TabItem:deselect()
-  if self:isSelected() then self.parent:deselect() end
 end
 
 function TabItem:setIcon(image, rotation)
