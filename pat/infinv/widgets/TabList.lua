@@ -51,7 +51,9 @@ end
 
 function TabListWidget:reindex(start)
   for i = (start or 1), #self.tabs do
-    self.tabs[i].index = i
+    local tab = self.tabs[i]
+    tab.index = i
+    tab:initChildren()
   end
 end
 
@@ -82,15 +84,18 @@ function TabItem:init()
   self.widgetName = fmt("%s.%s", self.parent.widgetName, self.id)
   self.parent.tabIds[self.id] = self
 
-  self.children = {}
-  if self.parent.data.initChildren then
-    for _, name in ipairs(self.parent.data.initChildren) do
-      self:initChild(name)
-    end
-  end
+  self:initChildren()
 
   if self.icon then
     self:setIcon(self.icon[1], self.icon[2])
+  end
+end
+
+function TabItem:initChildren()
+  self.children = {}
+  if not self.parent.data.initChildren then return end
+  for _, name in pairs(self.parent.data.initChildren) do
+    self:initChild(name)
   end
 end
 
