@@ -18,8 +18,11 @@ PageScroller = ScrollInputWidget:new("gridLayout.pageScroller", Callbacks.pageSc
 PageBar = PageBarWidget:new("gridLayout.pageBar")
 
 local fmt = string.format
+local shared = getmetatable''
 
 function init()
+  shared.pat_infinv_dismiss = pane.dismiss
+
   TabList:init()
   ItemGrid:init()
   IconPicker:init()
@@ -106,6 +109,7 @@ function shiftItemFromInventory(item) -- osb
 end
 
 function uninit()
+  shared.pat_infinv_dismiss = nil
   save()
 end
 

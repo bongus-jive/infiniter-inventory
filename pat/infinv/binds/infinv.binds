@@ -1,0 +1,11 @@
+{
+  "pat_infinv": {
+    "name": "^#ff80ce;Infiniter Inventory",
+    "binds": {
+      "open": {
+        "name": "Open",
+        "default": [ ]
+      }
+    }
+  }
+}

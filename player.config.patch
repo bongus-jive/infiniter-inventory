@@ -1,0 +1,3 @@
+[
+  { "op": "add", "path": "/genericScriptContexts/pat_infinv", "value": "/pat/infinv/binds/player.lua" }
+]
