@@ -284,10 +284,15 @@ local itemTypes = {
 
 function ItemGridWidget:sort()
   local items = jarray()
+  local itemRarities = {}
+
   jresize(items, self.slotCount)
   for i = 1, self.slotCount do
     local item = self:getSlotItem(self.slots[i])
-    if item then items[#items + 1] = item end
+    if item then
+      items[#items + 1] = item
+      itemRarities[item] = (item.parameters.rarity or root.itemConfig(item).config.rarity or "common"):lower()
+    end
   end
 
   table.sort(items, function(a, b)
@@ -297,8 +302,7 @@ function ItemGridWidget:sort()
     local aType, bType = root.itemType(a.name), root.itemType(b.name)
     if aType ~= bType then return itemTypes[aType] < itemTypes[bType] end
 
-    local aRarity = (a.parameters.rarity or root.itemConfig(a).config.rarity or "common"):lower()
-    local bRarity = (b.parameters.rarity or root.itemConfig(b).config.rarity or "common"):lower()
+    local aRarity, bRarity = itemRarities[a], itemRarities[b]
     if aRarity ~= bRarity then
       return rarities[aRarity] > rarities[bRarity]
     end
