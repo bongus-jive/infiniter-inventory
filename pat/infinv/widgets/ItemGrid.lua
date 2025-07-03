@@ -67,7 +67,7 @@ function ItemGridWidget:setSlotItem(slot, item, skipCallback)
 end
 
 function ItemGridWidget:addItem(inputItem)
-  local firstEmptySlot, hasStacked
+  local firstEmptySlot
 
   for i = 1, self.slotCount do
     local slot = self.slots[i]
@@ -75,7 +75,6 @@ function ItemGridWidget:addItem(inputItem)
     local slotItem = self:getSlotItem(slot)
     if slotItem then
       if self:stackWith(slotItem, inputItem) then
-        hasStacked = true
         self:setSlotItem(slot, slotItem)
         if self:isItemEmpty(inputItem) then return end
       end
@@ -215,9 +214,9 @@ local suffixes = {
 function ItemGridWidget:countToString(num)
   if not num or num == 1 then return "" end
 
-  for _, slop in ipairs(suffixes) do
-    local suffix, divisor = slop[1], slop[2]
-    local min = slop[3] or divisor
+  for _, v in ipairs(suffixes) do
+    local suffix, divisor = v[1], v[2]
+    local min = v[3] or divisor
     if num >= min then
       if num >= divisor * 10 then
         return fmt("%d%s", math.floor(num / divisor), suffix)
@@ -238,7 +237,7 @@ function ItemGridWidget:getMaxStack(item)
 end
 
 function ItemGridWidget:couldStack(item1, item2)
-  if item1 and item2 and root.itemDescriptorsMatch(item1, item2, true) then
+  if item1 and item2 and item1.name == item2.name and root.itemDescriptorsMatch(item1, item2, true) then
     local max = self:getMaxStack(item1)
     if item1.count < max then
       return math.min(item2.count, max - item1.count)
@@ -257,9 +256,14 @@ function ItemGridWidget:stackWith(item1, item2)
   return false
 end
 
-function ItemGridWidget:condenseStacks()
+function ItemGridWidget:condenseAndSortStacks()
   local items = self:getItems()
+  self:condenseStacks(items)
+  items = self:sortStacks(items)
+  self:setItems(items)
+end
 
+function ItemGridWidget:condenseStacks(items)
   for i = self.slotCount, 1, -1 do
     local item = items[i]
     if not item then goto continue end
@@ -272,8 +276,6 @@ function ItemGridWidget:condenseStacks()
     end
     ::continue::
   end
-
-  self:setItems(items)
 end
 
 local rarities = {common = 0, uncommon = 1, rare = 2, legendary = 3, essential = 4}
@@ -282,30 +284,25 @@ local itemTypes = {
   chestarmor = 13, legsarmor = 14, backarmor = 15, consumable = 16, blueprint = 17, codex = 18, inspectiontool = 19, instrument = 20, thrownitem = 22, unlockitem = 23, activeitem = 24, augmentitem = 25
 }
 
-function ItemGridWidget:sort()
+function ItemGridWidget:sortStacks(unsorted)
   local items = jarray()
-  local itemRarities = {}
-
   jresize(items, self.slotCount)
-  for i = 1, self.slotCount do
-    local item = self:getSlotItem(self.slots[i])
-    if item then
-      items[#items + 1] = item
-      itemRarities[item] = (item.parameters.rarity or root.itemConfig(item).config.rarity or "common"):lower()
-    end
+
+  local itemData = {}
+  for _, item in next, unsorted do
+    items[#items + 1] = item
+    local rarity = (item.parameters.rarity or root.itemConfig(item).config.rarity or "common"):lower()
+    local itemType = root.itemType(item.name)
+    itemData[item] = { rarity = rarities[rarity], type = itemTypes[itemType] }
   end
 
   table.sort(items, function(a, b)
     if a and not b then return true end
     if not a then return false end
 
-    local aType, bType = root.itemType(a.name), root.itemType(b.name)
-    if aType ~= bType then return itemTypes[aType] < itemTypes[bType] end
-
-    local aRarity, bRarity = itemRarities[a], itemRarities[b]
-    if aRarity ~= bRarity then
-      return rarities[aRarity] > rarities[bRarity]
-    end
+    local aData, bData = itemData[a], itemData[b]
+    if aData.type ~= bData.type then return aData.type < bData.type end
+    if aData.rarity ~= bData.rarity then return aData.rarity < bData.rarity end
 
     if a.name ~= b.name then return a.name < b.name end
     if a.count ~= b.count then return a.count > b.count end
@@ -313,7 +310,7 @@ function ItemGridWidget:sort()
     return false
   end)
 
-  self:setItems(items)
+  return items
 end
 
 function ItemGridWidget:quickStack()

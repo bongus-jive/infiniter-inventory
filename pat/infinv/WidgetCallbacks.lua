@@ -29,8 +29,7 @@ function Callbacks.deleteTabButton()
 end
 
 function Callbacks.sortButton()
-  ItemGrid:condenseStacks()
-  ItemGrid:sort()
+  ItemGrid:condenseAndSortStacks()
 end
 
 function Callbacks.quickStackButton()
