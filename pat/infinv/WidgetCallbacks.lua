@@ -3,6 +3,7 @@ Callbacks = {}
 -- footer buttons
 function Callbacks.newTabButton()
   createTab():select()
+  saveBagData()
 end
 
 function Callbacks.moveTabButton(_, offset)
@@ -19,12 +20,23 @@ function Callbacks.deleteTabButton()
 
   if ItemGrid:hasItems() then return end
 
+  local pages = tab.data.pages
+  for _, id in pairs(pages) do
+    local items = InvData:getPageItems(id)
+    if next(items) then return end
+  end
+
+  for _, id in pairs(pages) do
+    InvData:removePage(id)
+  end
+
   local index = tab.index
   tab:remove()
 
   local new = TabList.tabs[index] or TabList.tabs[index - 1]
   if new then new:select() end
 
+  saveBagData()
   updateWidgets()
 end
 
@@ -57,15 +69,19 @@ function Callbacks.changePage(_, offset)
 
   if currentIndex == #pages and not ItemGrid:hasItems() then
     if currentIndex == 1 or offset > 0 then return end
+    InvData:removePage(pages[#pages])
     table.remove(pages)
-  else
-    saveCurrentPage(tab)
   end
 
   tab.data.pageIndex = newIndex
 
-  if not pages[newIndex] then pages[newIndex] = jarray() end
-  ItemGrid:setItems(pages[newIndex])
+  if not pages[newIndex] then
+    pages[newIndex] = InvData:newPageId()
+    saveBagData()
+  end
+  local items = InvData:getPageItems(pages[newIndex])
+  ItemGrid:setItems(items)
+  
   updateWidgets()
 end
 
@@ -126,15 +142,17 @@ function Callbacks.blur()
 end
 
 function Callbacks.gridSlotChanged(slot)
-  save()
+  local tab = TabList:getSelected()
+  if not tab then return end
+  
+  saveBagData()
+  local page = tab.data.pages[tab.data.pageIndex]
+  InvData:setPageItems(page, ItemGrid:getItems())
+
   updateWidgets()
 end
 
 function Callbacks.tabSelected(tab, oldTab)
-  if oldTab then
-    saveCurrentPage(oldTab)
-  end
-  
   local label = tab and tab.data.label or ""
   widget.setText("editorLayout.labelTextbox", label)
   updateSubtitle()
@@ -157,7 +175,8 @@ function Callbacks.tabSelected(tab, oldTab)
   updateBacking()
 
   local pageIndex = math.max(1, math.min(tab.data.pageIndex, #tab.data.pages))
-  ItemGrid:setItems(tab.data.pages[pageIndex])
+  local items = InvData:getPageItems(tab.data.pages[pageIndex])
+  ItemGrid:setItems(items)
   updateWidgets()
 end
 

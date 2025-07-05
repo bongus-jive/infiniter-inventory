@@ -111,7 +111,7 @@ function ItemGridWidget:getItems()
   return items
 end
 
-function ItemGridWidget:setItems(items)
+function ItemGridWidget:setItems(items, doCallback)
   if not items then return self:clearItems() end
 
   for i = 1, self.slotCount do
@@ -120,7 +120,7 @@ function ItemGridWidget:setItems(items)
     self:setSlotItem(slot, item, true)
   end
 
-  if self.callback then self.callback() end
+  if self.callback and doCallback then self.callback() end
 end
 
 function ItemGridWidget:clearItems()
@@ -128,8 +128,6 @@ function ItemGridWidget:clearItems()
     local slot = self.slots[i]
     self:setSlotItem(slot, nil, true)
   end
-
-  if self.callback then self.callback() end
 end
 
 function ItemGridWidget:registerSlotCallback(callbackName, callback)
@@ -260,7 +258,7 @@ function ItemGridWidget:condenseAndSortStacks()
   local items = self:getItems()
   self:condenseStacks(items)
   items = self:sortStacks(items)
-  self:setItems(items)
+  self:setItems(items, true)
 end
 
 function ItemGridWidget:condenseStacks(items)
@@ -362,7 +360,7 @@ function ItemGridWidget:quickStack()
     ::continue::
   end
 
-  if hasStacked then self:setItems(items) end
+  if hasStacked then self:setItems(items, true) end
 end
 
 function ItemGridWidget:setBackingImage(image)

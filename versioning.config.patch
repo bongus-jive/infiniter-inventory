@@ -1,3 +1,4 @@
 [
-  { "op": "add", "path": "/pat-infiniteinventory", "value": 2 }
+  { "op": "add", "path": "/pat-infiniteinventory", "value": 3 },
+  { "op": "add", "path": "/pat-infiniteinventory-page", "value": 1 }
 ]

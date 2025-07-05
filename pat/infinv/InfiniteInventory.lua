@@ -1,3 +1,4 @@
+require "/pat/infinv/InvData.lua"
 require "/pat/infinv/WidgetCallbacks.lua"
 require "/pat/infinv/widgets/TabList.lua"
 require "/pat/infinv/widgets/ItemGrid.lua"
@@ -36,11 +37,9 @@ function init()
   Strings = config.getParameter("strings", {})
   Strings.tooltips = Strings.tooltips or {}
 
-  local vJson = player.getProperty("pat-infiniteinventory")
-  local invData = vJson and root.loadVersionedJson(vJson, "pat-infiniteinventory") or {}
-
+  local bags = InvData:load()
   local selectedTab
-  for _, tabData in ipairs(invData) do
+  for _, tabData in ipairs(bags) do
     local tab = createTab(tabData)
 
     if tabData.selected then selectedTab = tab end
@@ -110,31 +109,19 @@ end
 
 function uninit()
   shared.pat_infinv_dismiss = nil
-  save()
+  saveBagData()
 end
 
-function save()
-  local tabs = jarray()
+function saveBagData()
+  local bags = jarray()
   for i, tab in ipairs(TabList.tabs) do
     jremove(tab.data, "selected")
-    if tab:isSelected() then
-      tab.data.selected = true
-      saveCurrentPage(tab)
-    end
+    if tab:isSelected() then tab.data.selected = true end
     
-    tabs[i] = tab.data
+    bags[i] = tab.data
   end
 
-  local vJson = root.makeCurrentVersionedJson("pat-infiniteinventory", tabs)
-  player.setProperty("pat-infiniteinventory", vJson)
-end
-
-function saveCurrentPage(tab)
-  tab = tab or TabList:getSelected()
-  if not tab then return end
-
-  local index = tab.data.pageIndex
-  tab.data.pages[index] = ItemGrid:getItems()
+  InvData:save(bags)
 end
 
 function updateWidgets()
@@ -151,11 +138,15 @@ function updateWidgets()
   local pages = tab.data.pages or {}
   local pageIndex, pageCount = tab.data.pageIndex or 0, #pages
 
-  if next(pages[#pages]) then pageCount = pageCount + 1 end
+  local lastPageItems = InvData:getPageItems(pages[#pages])
+  if next(lastPageItems) then pageCount = pageCount + 1 end
 
-  local tabHasItems = false
-  for _, items in pairs(pages) do
-    if next(items) then tabHasItems = true break end
+  local tabHasItems = ItemGrid:hasItems() or next(lastPageItems)
+  if not tabHasItems then
+    for _, id in pairs(pages) do
+      local items = InvData:getPageItems(id)
+      if next(items) then tabHasItems = true break end
+    end
   end
 
   PageBar:set(pageIndex, pageCount)
@@ -212,7 +203,7 @@ function createTab(data)
   data = tab.data
 
   if not data.pages then data.pages = jarray() end
-  if not data.pages[1] then data.pages[1] = jarray() end
+  if not data.pages[1] then data.pages[1] = InvData:newPageId() end
   if not data.pageIndex then data.pageIndex = 1 end
   if not data.iconIndex then
     data.iconIndex = ((tab.index - 1) % TabList.data.defaultIconMaxIndex) + 1
