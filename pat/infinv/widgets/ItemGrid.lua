@@ -302,7 +302,7 @@ function ItemGridWidget:sortStacks(unsorted)
 
     local aData, bData = itemData[a], itemData[b]
     if aData.type ~= bData.type then return aData.type < bData.type end
-    if aData.rarity ~= bData.rarity then return aData.rarity < bData.rarity end
+    if aData.rarity ~= bData.rarity then return aData.rarity > bData.rarity end
 
     if a.name ~= b.name then return a.name < b.name end
     if a.count ~= b.count then return a.count > b.count end
