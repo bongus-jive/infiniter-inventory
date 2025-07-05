@@ -186,7 +186,7 @@ function Callbacks.tabBorderColor(color)
   if not tab then return end
 
   jremove(tab.data, "borderColor")
-  tab.data.borderColor = color
+  if color then tab.data.borderColor = color end
   updateBorder()
 end
 
@@ -195,6 +195,6 @@ function Callbacks.tabBackingColor(color)
   if not tab then return end
 
   jremove(tab.data, "backingColor")
-  tab.data.backingColor = color
+  if color then tab.data.backingColor = color end
   updateBacking()
 end
