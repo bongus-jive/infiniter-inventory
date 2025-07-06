@@ -212,3 +212,45 @@ function createTab(data)
   updateTabIcon(tab)
   return tab
 end
+
+function setPageBoxEnabled(enabled)
+  widget.setVisible("gridLayout.pageTextbox", enabled)
+  widget.setVisible("gridLayout.pageTextboxBg", enabled)
+  widget.setVisible("gridLayout.pageLabel", not enabled)
+end
+
+function changePage(newIndex)
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  local pages, currentIndex = tab.data.pages, tab.data.pageIndex
+  local maxPages = #pages
+
+  local lastPageItems = InvData:getPageItems(pages[maxPages])
+  if next(lastPageItems) then maxPages = maxPages + 1 end
+  
+  newIndex = math.max(1, math.min(newIndex, maxPages))
+  if newIndex == currentIndex then return end
+
+  while currentIndex == maxPages and currentIndex > newIndex do
+    local page = pages[currentIndex]
+    local items = InvData:getPageItems(page)
+    if next(items) then break end
+
+    InvData:removePage(page)
+    table.remove(pages)
+    currentIndex, maxPages = currentIndex - 1, maxPages - 1
+  end
+
+  newIndex = math.min(newIndex, maxPages)
+  tab.data.pageIndex = newIndex
+
+  if not pages[newIndex] then
+    pages[newIndex] = InvData:newPageId()
+    saveBagData()
+  end
+  local items = InvData:getPageItems(pages[newIndex])
+  ItemGrid:setItems(items)
+
+  updateWidgets()
+end

@@ -61,32 +61,41 @@ function Callbacks.changePage(_, offset)
   local tab = TabList:getSelected()
   if not tab then return end
 
-  local currentIndex = tab.data.pageIndex
-  local pages = tab.data.pages
-  
-  local newIndex = math.max(1, math.min(currentIndex + offset, #pages + 1))
-  if newIndex == currentIndex then return end
-
-  if currentIndex == #pages and not ItemGrid:hasItems() then
-    if currentIndex == 1 or offset > 0 then return end
-    InvData:removePage(pages[#pages])
-    table.remove(pages)
-  end
-
-  tab.data.pageIndex = newIndex
-
-  if not pages[newIndex] then
-    pages[newIndex] = InvData:newPageId()
-    saveBagData()
-  end
-  local items = InvData:getPageItems(pages[newIndex])
-  ItemGrid:setItems(items)
-  
-  updateWidgets()
+  changePage(tab.data.pageIndex + offset)
 end
 
 function Callbacks.pageScrolling(up)
-  Callbacks.changePage(nil, up and -1 or 1)
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  setPageBoxEnabled(false)
+  changePage(tab.data.pageIndex + (up and -1 or 1))
+end
+
+local pageBox = "gridLayout.pageTextbox"
+function Callbacks.pageBox()
+  if not widget.hasFocus(pageBox) then return end
+
+  local text = widget.getText(pageBox)
+  if not text or text:len() == 0 then return end
+
+  local newPage = tonumber(text)
+  changePage(newPage)
+  
+  local tab = TabList:getSelected()
+  if tab and tab.data.pageIndex ~= newPage then
+    widget.setText(pageBox, tostring(tab.data.pageIndex))
+  end
+end
+
+function Callbacks.focusPageBox()
+  setPageBoxEnabled(true)
+  widget.setText(pageBox, "")
+  widget.focus(pageBox)
+end
+
+function Callbacks.blurPageBox()
+  setPageBoxEnabled(false)
 end
 
 -- tab icons
