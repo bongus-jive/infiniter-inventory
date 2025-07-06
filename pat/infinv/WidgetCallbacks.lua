@@ -121,7 +121,7 @@ function Callbacks.tabIconRotateButton()
   updateTabIcon(tab)
 end
 
---tab label
+-- tab label
 function Callbacks.tabLabelTextbox()
   local tab = TabList:getSelected()
   if not tab then return end
@@ -136,11 +136,46 @@ function Callbacks.tabLabelTextbox()
   updateSubtitle()
 end
 
--- the rest
-function Callbacks.blur()
-  widget.focus("_blur"); widget.blur("_blur")
+-- tab customization
+function Callbacks.tabBorderSelect()
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  jremove(tab.data, "borderIndex")
+  local index = BorderPicker:getSelected()
+  if index ~= 1 then tab.data.borderIndex = index end
+  updateBorder()
 end
 
+function Callbacks.tabBackingSelect()
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  jremove(tab.data, "backingIndex")
+  local index = BackingPicker:getSelected()
+  if index ~= 1 then tab.data.backingIndex = index end
+  updateBacking()
+end
+
+function Callbacks.tabBorderColor(color)
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  jremove(tab.data, "borderColor")
+  if color then tab.data.borderColor = color end
+  updateBorder()
+end
+
+function Callbacks.tabBackingColor(color)
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  jremove(tab.data, "backingColor")
+  if color then tab.data.backingColor = color end
+  updateBacking()
+end
+
+-- the rest
 function Callbacks.gridSlotChanged(slot)
   local tab = TabList:getSelected()
   if not tab then return end
@@ -180,40 +215,6 @@ function Callbacks.tabSelected(tab, oldTab)
   updateWidgets()
 end
 
-function Callbacks.tabBorderSelect()
-  local tab = TabList:getSelected()
-  if not tab then return end
-
-  jremove(tab.data, "borderIndex")
-  local index = BorderPicker:getSelected()
-  if index ~= 1 then tab.data.borderIndex = index end
-  updateBorder()
-end
-
-function Callbacks.tabBackingSelect()
-  local tab = TabList:getSelected()
-  if not tab then return end
-
-  jremove(tab.data, "backingIndex")
-  local index = BackingPicker:getSelected()
-  if index ~= 1 then tab.data.backingIndex = index end
-  updateBacking()
-end
-
-function Callbacks.tabBorderColor(color)
-  local tab = TabList:getSelected()
-  if not tab then return end
-
-  jremove(tab.data, "borderColor")
-  if color then tab.data.borderColor = color end
-  updateBorder()
-end
-
-function Callbacks.tabBackingColor(color)
-  local tab = TabList:getSelected()
-  if not tab then return end
-
-  jremove(tab.data, "backingColor")
-  if color then tab.data.backingColor = color end
-  updateBacking()
+function Callbacks.blur()
+  widget.focus("_blur"); widget.blur("_blur")
 end
