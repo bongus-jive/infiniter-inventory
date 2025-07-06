@@ -136,12 +136,10 @@ function updateWidgets()
 
   if not tab then return end
   local pages = tab.data.pages or {}
-  local pageIndex, pageCount = tab.data.pageIndex or 0, #pages
+  local pageIndex = tab.data.pageIndex or 0
+  local pageCount = getMaxPages()
 
-  local lastPageItems = InvData:getPageItems(pages[#pages])
-  if next(lastPageItems) then pageCount = pageCount + 1 end
-
-  local tabHasItems = ItemGrid:hasItems() or next(lastPageItems)
+  local tabHasItems = ItemGrid:hasItems()
   if not tabHasItems then
     for _, id in pairs(pages) do
       local items = InvData:getPageItems(id)
@@ -224,13 +222,7 @@ function changePage(newIndex)
   if not tab then return end
 
   local pages, currentIndex = tab.data.pages, tab.data.pageIndex
-  local maxPages = #pages
-
-  local lastPageItems = InvData:getPageItems(pages[maxPages])
-  if next(lastPageItems) then maxPages = maxPages + 1 end
-  
-  newIndex = math.max(1, math.min(newIndex, maxPages))
-  if newIndex == currentIndex then return end
+  local maxPages = getMaxPages()
 
   while currentIndex == maxPages and currentIndex > newIndex do
     local page = pages[currentIndex]
@@ -253,4 +245,16 @@ function changePage(newIndex)
   ItemGrid:setItems(items)
 
   updateWidgets()
+end
+
+function getMaxPages()
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  local maxPages = #tab.data.pages
+
+  local lastPageItems = InvData:getPageItems(tab.data.pages[maxPages])
+  if next(lastPageItems) then maxPages = maxPages + 1 end
+
+  return maxPages
 end
