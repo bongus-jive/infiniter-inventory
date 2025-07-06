@@ -223,6 +223,9 @@ function changePage(newIndex)
 
   local pages, currentIndex = tab.data.pages, tab.data.pageIndex
   local maxPages = getMaxPages()
+  
+  newIndex = math.max(1, math.min(newIndex, maxPages))
+  if newIndex == currentIndex then return end
 
   while currentIndex == maxPages and currentIndex > newIndex do
     local page = pages[currentIndex]
