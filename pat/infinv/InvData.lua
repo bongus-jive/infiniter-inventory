@@ -15,6 +15,7 @@ function InvData:load()
 
   self.pages = {}
   self.newIds = {}
+  self.unsavedIds = {}
   self.unusedIds = {}
   for _, id in pairs(data.unusedIds) do self.unusedIds[id] = true end
 
@@ -39,19 +40,26 @@ function InvData:save(bags)
 
   local vJson = root.makeCurrentVersionedJson(INV_ID, self.data)
   player.setProperty(INV_ID, vJson)
+
+  for _, id in pairs(self.unsavedIds) do
+    local items = self.pages[id]
+    local data = items and root.makeCurrentVersionedJson(PAGE_ID, items) or nil
+    player.setProperty(fmt(PAGE_NAME, id), data)
+  end
+  self.unsavedIds = {}
 end
 
 
 function InvData:removePage(id)
   self.pages[id] = nil
-
+  
   if self.newIds[id] then
     self.newIds[id] = nil
     return
   end
-
+  
   self.unusedIds[id] = true
-  player.setProperty(fmt(PAGE_NAME, id), nil)
+  table.insert(self.unsavedIds, id)
 end
 
 function InvData:newPageId()
@@ -91,7 +99,5 @@ function InvData:setPageItems(id, items)
   if self.newIds[id] and not next(items) then return end
   
   self.newIds[id] = nil
-
-  local vJson = root.makeCurrentVersionedJson(PAGE_ID, items)
-  player.setProperty(fmt(PAGE_NAME, id), vJson)
+  table.insert(self.unsavedIds, id)
 end

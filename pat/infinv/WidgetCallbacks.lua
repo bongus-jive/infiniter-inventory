@@ -3,7 +3,7 @@ Callbacks = {}
 -- footer buttons
 function Callbacks.newTabButton()
   createTab():select()
-  saveBagData()
+  save()
 end
 
 function Callbacks.moveTabButton(_, offset)
@@ -36,7 +36,7 @@ function Callbacks.deleteTabButton()
   local new = TabList.tabs[index] or TabList.tabs[index - 1]
   if new then new:select() end
 
-  saveBagData()
+  save()
   updateWidgets()
 end
 
@@ -189,9 +189,9 @@ function Callbacks.gridSlotChanged(slot)
   local tab = TabList:getSelected()
   if not tab then return end
   
-  saveBagData()
   local page = tab.data.pages[tab.data.pageIndex]
   InvData:setPageItems(page, ItemGrid:getItems())
+  save()
 
   updateWidgets()
 end

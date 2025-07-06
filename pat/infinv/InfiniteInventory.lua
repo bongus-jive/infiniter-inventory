@@ -109,10 +109,10 @@ end
 
 function uninit()
   shared.pat_infinv_dismiss = nil
-  saveBagData()
+  save()
 end
 
-function saveBagData()
+function save()
   local bags = jarray()
   for i, tab in ipairs(TabList.tabs) do
     jremove(tab.data, "selected")
@@ -247,7 +247,7 @@ function changePage(newIndex)
 
   if not pages[newIndex] then
     pages[newIndex] = InvData:newPageId()
-    saveBagData()
+    save()
   end
   local items = InvData:getPageItems(pages[newIndex])
   ItemGrid:setItems(items)
