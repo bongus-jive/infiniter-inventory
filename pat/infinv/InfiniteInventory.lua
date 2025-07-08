@@ -57,7 +57,7 @@ end
 function update()
   PageBar:update()
 
-  if not BlockQuickMoveIn and widget.getChecked("quickMoveCheckbox") and TabList:getSelected() then
+  if not BlockQuickMoveIn and widget.getChecked("gridLayout.quickMoveCheckbox") and TabList:getSelected() then
     local item = player.swapSlotItem()
     if item then
       local remainder = ItemGrid:addItem(item)
@@ -130,9 +130,6 @@ function updateWidgets()
   local enabled = tab ~= nil
   widget.setVisible("gridLayout", enabled)
   widget.setVisible("editorLayout", enabled and widget.getChecked("tabConfigCheckbox"))
-  widget.setButtonEnabled("sortButton", enabled)
-  widget.setButtonEnabled("quickStackButton", enabled)
-  widget.setButtonEnabled("quickMoveCheckbox", enabled)
 
   if not tab then return end
   local pages = tab.data.pages or {}

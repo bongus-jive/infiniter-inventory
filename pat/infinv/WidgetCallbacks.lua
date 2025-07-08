@@ -49,7 +49,7 @@ function Callbacks.quickStackButton()
 end
 
 function Callbacks.quickMoveCheckbox()
-  ItemGrid:setQuickMove(widget.getChecked("quickMoveCheckbox"))
+  ItemGrid:setQuickMove(widget.getChecked("gridLayout.quickMoveCheckbox"))
 end
 
 function Callbacks.tabConfigCheckbox()
