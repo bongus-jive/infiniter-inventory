@@ -86,6 +86,10 @@ function TabItem:init()
 
   self:initChildren()
 
+  if self.highlighted then
+    self:setHighlighted(true)
+  end
+
   if self.icon then
     self:setIcon(self.icon[1], self.icon[2])
   end
@@ -149,4 +153,10 @@ function TabItem:setIcon(image, rotation)
   
   widget.addChild(self.widgetName, iconConfig, "icon")
   self.icon = {image, rotation}
+end
+
+function TabItem:setHighlighted(enabled)
+  if not self.children.highlight then return end
+  widget.setVisible(self.children.highlight, enabled)
+  self.highlighted = enabled or nil
 end

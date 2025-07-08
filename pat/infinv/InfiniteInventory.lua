@@ -1,4 +1,5 @@
 require "/pat/infinv/InvData.lua"
+require "/pat/infinv/Searcher.lua"
 require "/pat/infinv/WidgetCallbacks.lua"
 require "/pat/infinv/widgets/TabList.lua"
 require "/pat/infinv/widgets/ItemGrid.lua"
@@ -56,6 +57,7 @@ end
 
 function update()
   PageBar:update()
+  Searcher:update()
 
   if not BlockQuickMoveIn and widget.getChecked("gridLayout.quickMoveCheckbox") and TabList:getSelected() then
     local item = player.swapSlotItem()
@@ -243,7 +245,7 @@ function changePage(newIndex)
   end
   local items = InvData:getPageItems(pages[newIndex])
   ItemGrid:setItems(items)
-
+  Searcher:pageChanged()
   updateWidgets()
 end
 

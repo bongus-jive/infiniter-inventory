@@ -194,6 +194,8 @@ function Callbacks.gridSlotChanged(slot)
   save()
 
   updateWidgets()
+
+  Searcher:slotUpdated(slot)
 end
 
 function Callbacks.tabSelected(tab, oldTab)
@@ -221,7 +223,13 @@ function Callbacks.tabSelected(tab, oldTab)
   local pageIndex = math.max(1, math.min(tab.data.pageIndex, #tab.data.pages))
   local items = InvData:getPageItems(tab.data.pages[pageIndex])
   ItemGrid:setItems(items)
+  Searcher:pageChanged()
   updateWidgets()
+end
+
+function Callbacks.search()
+  local text = widget.getText("gridLayout.searchBox")
+  Searcher:start(text)
 end
 
 function Callbacks.blur()

@@ -28,6 +28,7 @@ function ItemGridWidget:init()
     slot.itemSlot = fmt("%s.slot", slot.name)
     slot.countLabel = fmt("%s.count", slot.name)
     slot.backingImage = fmt("%s.backing", slot.name)
+    slot.highlightImage = fmt("%s.highlight", slot.name)
     self.slots[i] = slot
     widget.setData(slot.itemSlot, slot.index)
   end
@@ -366,5 +367,19 @@ end
 function ItemGridWidget:setBackingImage(image)
   for i = 1, self.slotCount do
     widget.setImage(self.slots[i].backingImage, image)
+    widget.setImage(self.slots[i].highlightImage, image..self.data.highlightDirectives)
   end
+end
+
+function ItemGridWidget:resetHighlighted()
+  for i = 1, self.slotCount do
+    widget.setVisible(self.slots[i].highlightImage, false)
+  end
+end
+
+function ItemGridWidget:setSlotHighlighted(slot, enabled)
+  if type(slot) == "number" then slot = self.slots[slot] end
+  if not slot then return end
+
+  widget.setVisible(slot.highlightImage, enabled)
 end
