@@ -39,12 +39,39 @@ function IconPickerWidget:setIconSlotItem(item)
   widget.setItemSlotItem(self.iconSlot, item)
 end
 
-function IconPickerWidget:getItemIcon(item)
-  item = root.itemConfig(item)
+function IconPickerWidget:getItemIcon(itemDesc)
+  item = root.itemConfig(itemDesc)
   if not item then return end
-  
-  local icon = item.parameters.inventoryIcon or item.config.inventoryIcon
+
+  local function instanceValue(key, def)
+    return item.parameters[key] or item.config[key] or def
+  end
+
+  local itemType = root.itemType(itemDesc.name)
+  local icon
+  if itemType == "codex" then
+    icon = instanceValue("codexIcon")
+  else
+    icon = instanceValue("inventoryIcon")
+  end
   if not icon then return end
+
+  local directives = ""
+  if itemType == "headarmor" or itemType == "chestarmor" or itemType == "legsarmor" or itemType == "backarmor" then
+    directives = instanceValue("directives")
+    if not directives or directives:len() == 0 then
+      local options = instanceValue("colorOptions", { "" })
+      local index = (instanceValue("colorIndex", 0) % #options) + 1
+      local option = options[index]
+
+      if type(option) == "string" then
+        directives = "?" .. option
+      else
+        directives = "?replace"
+        for from, to in pairs(option) do directives = fmt("%s;%s=%s", directives, from, to) end
+      end
+    end
+  end
 
   local function absolutePath(path)
     if path and path:sub(1, 1) ~= "/" then return item.directory .. path end
@@ -52,11 +79,11 @@ function IconPickerWidget:getItemIcon(item)
   end
 
   if type(icon) == "string" then
-    return absolutePath(icon)
+    return absolutePath(icon) .. directives
   end
 
   for _, drawable in pairs(icon) do
-    drawable.image = absolutePath(drawable.image)
+    drawable.image = absolutePath(drawable.image) .. directives
   end
   return icon
 end
