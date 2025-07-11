@@ -73,6 +73,11 @@ function IconPickerWidget:getItemIcon(itemDesc)
     end
   end
 
+  if itemType == "blueprint" then
+    if type(icon) == "string" then icon = {{image = icon}} end
+    table.insert(icon, 1, root.assetJson("/blueprint.config:iconUnderlay"))
+  end
+
   local function absolutePath(path)
     if path and path:sub(1, 1) ~= "/" then return item.directory .. path end
     return path
