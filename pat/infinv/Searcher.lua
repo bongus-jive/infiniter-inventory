@@ -96,7 +96,7 @@ function Searcher:slotUpdated(slot)
     self.searchedPages[pageId].slots[slot.index] = matches
   else
     local slots = self:searchPage(pageId)
-    self.searchedPages[pageId] = { pageIndex = pageIndex, parentTab = tab, slots = slots }
+    self.searchedPages[pageId] = { parentTab = tab, pageIndex = pageIndex, slots = slots }
   end
 
   self:highlightResults()
@@ -104,13 +104,15 @@ end
 
 function Searcher:searchPage(id)
   local items = InvData:getPageItems(id)
+  local count = 0
   local matchingSlots = {}
   for i, item in pairs(items) do
     if self:searchItem(item) then
       matchingSlots[i] = true
+      count = count + 1
     end
   end
-  return matchingSlots
+  return matchingSlots, count
 end
 
 function Searcher:searchItem(item)
@@ -151,10 +153,12 @@ function Searcher:searchAllPages()
   end
 
   local selectedTab = TabList:getSelected()
+  local currentPage
   if selectedTab then
     --add current page first
     local pageIndex, pages = selectedTab.data.pageIndex, selectedTab.data.pages
-    addPage(selectedTab, pageIndex, pages[pageIndex])
+    currentPage = pages[pageIndex]
+    addPage(selectedTab, pageIndex, currentPage)
 
     --then add the rest of the current tab's pages
     for index, id in ipairs(pages) do
@@ -173,10 +177,19 @@ function Searcher:searchAllPages()
 
   local maxTime = script.updateDt() * 0.8
   local start = os.clock()
+  local foundPage = false
 
   for _, page in ipairs(pageList) do
-    local slots = self:searchPage(page.id)
+    local slots, count = self:searchPage(page.id)
     self.searchedPages[page.id] = { parentTab = page.parent, pageIndex = page.index, slots = slots }
+
+    if count > 0 and not foundPage then
+      foundPage = true
+      if page.id ~= currentPage then
+        page.parent:select()
+        changePage(page.index)
+      end
+    end
 
     local now = os.clock()
     if now - start > maxTime then
