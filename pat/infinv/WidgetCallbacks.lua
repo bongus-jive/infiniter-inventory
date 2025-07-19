@@ -38,6 +38,7 @@ function Callbacks.deleteTabButton()
 
   save()
   updateWidgets()
+  Searcher:restart()
 end
 
 function Callbacks.sortButton()
@@ -227,11 +228,39 @@ function Callbacks.tabSelected(tab, oldTab)
   updateWidgets()
 end
 
+function Callbacks.searchButton()
+  local checked = widget.getChecked("searchButton")
+
+  if checked then
+    widget.setVisible("search", true)
+    widget.setText("search.textbox", "")
+    widget.focus("search.textbox")
+    return
+  end
+
+  local text = widget.getText("search.textbox") or ""
+  if text:len() > 0 then
+    Searcher:start(text, true)
+    widget.setChecked("searchButton", true)
+    return
+  end
+
+  widget.setVisible("search", false)
+  Searcher:reset()
+end
+
 function Callbacks.search()
-  local text = widget.getText("gridLayout.searchBox")
-  Searcher:start(text)
+  if not widget.hasFocus("search.textbox") then return end
+  local text = widget.getText("search.textbox")
+  Searcher:start(text, false)
+end
+
+function Callbacks.searchEnter()
+  local text = widget.getText("search.textbox")
+  Searcher:start(text, true)
 end
 
 function Callbacks.blur()
-  widget.focus("_blur"); widget.blur("_blur")
+  widget.focus("_blur")
+  widget.blur("_blur")
 end

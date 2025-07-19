@@ -11,10 +11,17 @@ function Searcher:update()
   end
 end
 
-function Searcher:start(name)
-  if not name or name:len() == 0 then return self:reset() end
+function Searcher:start(text, goToResult)
+  if not text or text:len() == 0 then return self:reset() end
+  text = text:lower()
 
-  self.currentSearch = name:lower()
+  self.goToResult = goToResult
+  if self.currentSearch == text then
+    if goToResult then Searcher:nextResult() end
+    return
+  end
+
+  self.currentSearch = text
   self.searchedPages = {}
 
   self.searchThread = coroutine.create(self.searchAllPages)
@@ -29,6 +36,13 @@ function Searcher:reset()
   self:clearHighlights()
 end
 
+function Searcher:restart()
+  local text = self.currentSearch
+  if not text then return end
+  self:reset()
+  self:start(text, self.goToResult)
+end
+
 function Searcher:clearHighlights()
   ItemGrid:resetHighlighted()
   for _, tab in pairs(TabList.tabs) do
@@ -36,6 +50,7 @@ function Searcher:clearHighlights()
   end
   widget.setChecked("gridLayout.prevPageButton", false)
   widget.setChecked("gridLayout.nextPageButton", false)
+  widget.setText("search.results", "")
 end
 
 function Searcher:highlightResults()
@@ -48,12 +63,13 @@ function Searcher:highlightResults()
     currentId = currentTab.data.pages[currentIndex]
   end
 
+  local totalItems, totalPages = 0, 0
+
   for pageId, v in pairs(self.searchedPages) do
-    for _, matches in pairs(v.slots) do
-      if matches then goto hasItem end
-    end
-    goto continue
-    ::hasItem::
+    if v.count == 0 then goto continue end
+
+    totalItems = totalItems + v.count
+    totalPages = totalPages + 1
 
     v.parentTab:setHighlighted(true)
 
@@ -74,6 +90,8 @@ function Searcher:highlightResults()
 
     ::continue::
   end
+
+  widget.setText("search.results", string.format(Strings.searchResultText, totalItems, totalPages))
 end
 
 function Searcher:pageChanged()
@@ -90,19 +108,24 @@ function Searcher:slotUpdated(slot)
   local pageIndex = tab.data.pageIndex
   local pageId = tab.data.pages[pageIndex]
 
-  if slot and self.searchedPages[pageId] then
+  if not (slot and self.searchedPages[pageId]) then
+    self:searchPage(pageId, pageIndex, tab)
+  else
     local item = ItemGrid:getSlotItem(slot)
     local matches = self:searchItem(item)
-    self.searchedPages[pageId].slots[slot.index] = matches
-  else
-    local slots = self:searchPage(pageId)
-    self.searchedPages[pageId] = { parentTab = tab, pageIndex = pageIndex, slots = slots }
+
+    local pageResults = self.searchedPages[pageId]
+    pageResults.slots[slot.index] = matches
+    pageResults.count = 0
+    for _, v in pairs(pageResults.slots) do
+      if v then pageResults.count = pageResults.count + 1 end
+    end
   end
 
   self:highlightResults()
 end
 
-function Searcher:searchPage(id)
+function Searcher:searchPage(id, index, parent)
   local items = InvData:getPageItems(id)
   local count = 0
   local matchingSlots = {}
@@ -112,7 +135,9 @@ function Searcher:searchPage(id)
       count = count + 1
     end
   end
-  return matchingSlots, count
+  local result = { parentTab = parent, pageIndex = index, slots = matchingSlots, count = count }
+  self.searchedPages[id] = result
+  return result
 end
 
 function Searcher:searchItem(item)
@@ -152,17 +177,17 @@ function Searcher:searchAllPages()
     table.insert(pageList, { parent = parent, index = index, id = id })
   end
 
-  local selectedTab = TabList:getSelected()
+  local currentTab = TabList:getSelected()
   local currentPage
-  if selectedTab then
+  if currentTab then
     --add current page first
-    local pageIndex, pages = selectedTab.data.pageIndex, selectedTab.data.pages
+    local pageIndex, pages = currentTab.data.pageIndex, currentTab.data.pages
     currentPage = pages[pageIndex]
-    addPage(selectedTab, pageIndex, currentPage)
+    addPage(currentTab, pageIndex, currentPage)
 
     --then add the rest of the current tab's pages
     for index, id in ipairs(pages) do
-      addPage(selectedTab, index, id)
+      addPage(currentTab, index, id)
     end
   end
 
@@ -180,10 +205,9 @@ function Searcher:searchAllPages()
   local foundPage = false
 
   for _, page in ipairs(pageList) do
-    local slots, count = self:searchPage(page.id)
-    self.searchedPages[page.id] = { parentTab = page.parent, pageIndex = page.index, slots = slots }
+    local result = self:searchPage(page.id, page.index, page.parent)
 
-    if count > 0 and not foundPage then
+    if result.count > 0 and not foundPage and self.goToResult then
       foundPage = true
       if page.id ~= currentPage then
         page.parent:select()
@@ -194,9 +218,48 @@ function Searcher:searchAllPages()
     local now = os.clock()
     if now - start > maxTime then
       start = now
+      self:highlightResults()
       coroutine.yield()
     end
   end
 
   self:highlightResults()
+end
+
+function Searcher:nextResult()
+  if not self.currentSearch then return end
+  
+  local currentTab = TabList:getSelected()
+  local currentIndex, currentId
+  if currentTab then
+    currentIndex = currentTab.data.pageIndex
+    currentId = currentTab.data.pages[currentIndex]
+  end
+
+  local pages = {}
+  local start = 1
+  for _, tab in ipairs(TabList.tabs) do
+    for _, id in ipairs(tab.data.pages) do
+      table.insert(pages, id)
+      if tab == currentTab and id == currentId then
+        start = #pages
+      end
+    end
+  end
+
+  local count = #pages
+  for i = 0, count do
+    local index = ((i + start) % count)  + 1
+    local pageId = pages[index]
+    local searchedPage = self.searchedPages[pageId]
+    if not searchedPage then goto continue end
+
+    if searchedPage.count > 0 then
+      searchedPage.parentTab:select()
+      changePage(searchedPage.pageIndex)
+      break
+    end
+
+    ::continue::
+  end
 end
