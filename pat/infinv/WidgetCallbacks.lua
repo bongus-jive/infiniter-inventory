@@ -252,7 +252,7 @@ end
 function Callbacks.search()
   if not widget.hasFocus("search.textbox") then return end
   local text = widget.getText("search.textbox")
-  Searcher:start(text, false)
+  Searcher:typing(text)
 end
 
 function Callbacks.searchEnter()

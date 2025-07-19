@@ -55,9 +55,9 @@ function init()
   updateWidgets()
 end
 
-function update()
+function update(dt)
+  Searcher:update(dt)
   PageBar:update()
-  Searcher:update()
 
   if not BlockQuickMoveIn and widget.getChecked("gridLayout.quickMoveCheckbox") and TabList:getSelected() then
     local item = player.swapSlotItem()

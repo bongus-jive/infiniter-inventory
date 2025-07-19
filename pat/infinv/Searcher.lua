@@ -1,6 +1,13 @@
 Searcher = {}
 
-function Searcher:update()
+function Searcher:update(dt)
+  if self.typingTimer then
+    self.typingTimer = self.typingTimer - dt
+    if self.typingTimer <= 0 then
+      self:start(self.typingText, false)
+    end
+  end
+  
   if self.searchThread then
     if coroutine.status(self.searchThread) == "dead" then
       self.searchThread = nil
@@ -12,6 +19,7 @@ function Searcher:update()
 end
 
 function Searcher:start(text, goToResult)
+  self.typingTimer = nil
   if not text or text:len() == 0 then return self:reset() end
   text = text:lower()
 
@@ -29,9 +37,16 @@ function Searcher:start(text, goToResult)
   if not success then error(result) end
 end
 
+function Searcher:typing(text)
+  if not text or text:len() == 0 then return self:reset() end
+  self.typingTimer = 0.2
+  self.typingText = text
+end
+
 function Searcher:reset()
   self.currentSearch = nil
   self.searchThread = nil
+  self.typingText = nil
   self.searchedPages = {}
   self:clearHighlights()
 end
