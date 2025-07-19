@@ -241,7 +241,7 @@ function Searcher:searchAllPages()
   self:highlightResults()
 end
 
-function Searcher:nextResult()
+function Searcher:nextResult(prev)
   if not self.currentSearch then return end
   
   local currentTab = TabList:getSelected()
@@ -263,8 +263,14 @@ function Searcher:nextResult()
   end
 
   local count = #pages
-  for i = 0, count do
-    local index = ((i + start) % count)  + 1
+
+  local init, final, step = 1, count, 1
+  if prev then
+    init, final, step = count - 1, 0, -1
+  end
+
+  for i = init, final, step do
+    local index = ((i + start - 1) % count) + 1
     local pageId = pages[index]
     local searchedPage = self.searchedPages[pageId]
     if not searchedPage then goto continue end

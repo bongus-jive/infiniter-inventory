@@ -260,6 +260,11 @@ function Callbacks.searchEnter()
   Searcher:start(text, true)
 end
 
+function Callbacks.searchTabbed(_, prev)
+  Searcher:nextResult(prev)
+  widget.focus("search.textbox")
+end
+
 function Callbacks.blur()
   widget.focus("_blur")
   widget.blur("_blur")
