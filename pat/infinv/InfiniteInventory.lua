@@ -57,6 +57,7 @@ end
 
 function update(dt)
   Searcher:update(dt)
+  ItemGrid:update(dt)
   PageBar:update()
 
   if not BlockQuickMoveIn and widget.getChecked("gridLayout.quickMoveCheckbox") and TabList:getSelected() then

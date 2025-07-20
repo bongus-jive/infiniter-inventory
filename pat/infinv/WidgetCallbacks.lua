@@ -229,9 +229,7 @@ function Callbacks.tabSelected(tab, oldTab)
 end
 
 function Callbacks.searchButton()
-  local checked = widget.getChecked("searchButton")
-
-  if checked then
+  if not widget.active("search") then
     widget.setVisible("search", true)
     widget.setText("search.textbox", "")
     widget.focus("search.textbox")
@@ -241,7 +239,6 @@ function Callbacks.searchButton()
   local text = widget.getText("search.textbox") or ""
   if text:len() > 0 then
     Searcher:start(text, true)
-    widget.setChecked("searchButton", true)
     return
   end
 

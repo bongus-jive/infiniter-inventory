@@ -41,6 +41,24 @@ function ItemGridWidget:init()
     widget.setPosition(slot1.name, pos2)
     widget.setPosition(slot2.name, pos1)
   end
+
+  self:setBackingImage(self.data.backingImage)
+  self.highlightTimer = 0
+end
+
+function ItemGridWidget:update(dt)
+  local hl = self.data.highlight
+
+  self.highlightTimer = (self.highlightTimer + dt) % hl.cycle
+  local frame = math.floor((self.highlightTimer / hl.cycle) * hl.frames)
+  
+  if frame ~= self.highlightFrame then
+    self.highlightFrame = frame
+    local image = self.highlightFrames[frame]
+    for i = 1, self.slotCount do
+      widget.setImage(self.slots[i].highlightImage, image)
+    end
+  end
 end
 
 function ItemGridWidget:getSlotItem(slot)
@@ -367,7 +385,13 @@ end
 function ItemGridWidget:setBackingImage(image)
   for i = 1, self.slotCount do
     widget.setImage(self.slots[i].backingImage, image)
-    widget.setImage(self.slots[i].highlightImage, image..self.data.highlightDirectives)
+  end
+
+  self.highlightFrames = {}
+  local hl = self.data.highlight
+  for i = 0, self.data.highlight.frames - 1 do
+    local frame = sb.replaceTags(hl.image, {frame = tostring(i), backing = image})
+    self.highlightFrames[i] = frame
   end
 end
 
