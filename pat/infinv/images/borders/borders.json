@@ -1,0 +1,14 @@
+[
+  "/pat/infinv/images/borders/base.png:<frame>",
+  "/pat/infinv/images/borders/base.png:<frame>?replace;1A510E=1D5D6E;1A2D17F0=0F3A45F1",
+  "/pat/infinv/images/borders/base.png:<frame>?replace;1A510E=1C4F6F;1A2D17F0=0F3145F0",
+  "/pat/infinv/images/borders/base.png:<frame>?replace;1A510E=00385F;1A2D17F0=16232BF0",
+  "/pat/infinv/images/borders/base.png:<frame>?replace;1A510E=515885;1A2D17F0=2D324DE6",
+  "/pat/infinv/images/borders/base.png:<frame>?replace;1A510E=6A5085;1A2D17F0=3C2B4DE6",
+  "/pat/infinv/images/borders/base.png:<frame>?replace;1A510E=610101;1A2D17F0=3E0505F0",
+  "/pat/infinv/images/borders/base.png:<frame>?replace;1A510E=85734F;1A2D17F0=4F432CE6",
+  "/pat/infinv/images/borders/base.png:<frame>?replace;1A510E=756620;1A2D17F0=574B17F0",
+  "/pat/infinv/images/borders/base.png:<frame>?replace;1A510E=626262;1A2D17F0=2F2F2FEA",
+  "/pat/infinv/images/borders/base.png:<frame>?replace;1A510E=FFFFFF;1A2D17F0=999999E6?multiply=<custom>",
+  "/pat/infinv/images/borders/base.png:<frame>?replace;1A510E=<custom>;1A2D17F0=2F2F2FEA"
+]
