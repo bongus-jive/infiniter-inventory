@@ -61,6 +61,12 @@ function TabListWidget:getSelected()
   return self.selectedTab
 end
 
+function TabListWidget:resetHighlighted()
+  for _, tab in pairs(self.tabs) do
+    tab:setHighlighted(false)
+  end
+end
+
 function TabListWidget:newTab(data)
   local new = {}
   setmetatable(new, {__index = self.TabItem})

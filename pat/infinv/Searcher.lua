@@ -25,7 +25,7 @@ function Searcher:start(text, goToResult)
 
   self.goToResult = goToResult
   if self.currentSearch == text then
-    if goToResult then Searcher:nextResult() end
+    if goToResult then self:nextResult() end
     return
   end
 
@@ -60,9 +60,7 @@ end
 
 function Searcher:clearHighlights()
   ItemGrid:resetHighlighted()
-  for _, tab in pairs(TabList.tabs) do
-    tab:setHighlighted(false)
-  end
+  TabList:resetHighlighted()
   widget.setChecked("gridLayout.prevPageButton", false)
   widget.setChecked("gridLayout.nextPageButton", false)
   widget.setText("search.results", "")
