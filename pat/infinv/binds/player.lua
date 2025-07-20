@@ -19,14 +19,18 @@ function init()
 end
 
 function update()
-  if input.bindDown("pat_infinv", "open") then open(true) end
+  if input.bindDown("pat_infinv", "open") then
+    open(false, true)
+  elseif input.bindDown("pat_infinv", "openWithInv") then
+    open(true)
+  end
 end
 
-function open(withInventory)
+function open(withInventory, toggle)
   if shared.pat_infinv_dismiss then
     pcall(shared.pat_infinv_dismiss)
     shared.pat_infinv_dismiss = nil
-    if withInventory then return end
+    if withInventory or toggle then return end
   end
 
   cfg.openWithInventory = withInventory

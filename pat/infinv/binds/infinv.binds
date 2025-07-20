@@ -5,6 +5,10 @@
       "open": {
         "name": "Open",
         "default": [ ]
+      },
+      "openWithInv": {
+        "name": "Open with Inventory",
+        "default": [ ]
       }
     }
   }
