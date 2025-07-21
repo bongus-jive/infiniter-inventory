@@ -112,7 +112,7 @@ function Callbacks.tabIconSlot(item)
   local tab = TabList:getSelected()
   if not tab then return end
 
-  jremove(tab.data, "iconItem")
+  tab.data.iconItem = nil
   if item then tab.data.iconItem = {name = item.name, parameters = item.parameters} end
   updateTabIcon(tab)
 end
@@ -123,10 +123,7 @@ function Callbacks.tabIconRotateButton()
 
   local rot = tab.data.iconRotation or 360
   rot = rot - 90
-  jremove(tab.data, "iconRotation")
-  if rot > 0 then
-    tab.data.iconRotation = rot
-  end
+  tab.data.iconRotation = rot > 0 and rot or nil
 
   updateTabIcon(tab)
 end
@@ -138,7 +135,7 @@ function Callbacks.tabLabelTextbox()
 
   local text = widget.getText("editorLayout.labelTextbox")
   
-  jremove(tab.data, "label")
+  tab.data.label = nil
   if text and text:len() > 0 then
     tab.data.label = text
   end
@@ -151,9 +148,8 @@ function Callbacks.tabBorderSelect()
   local tab = TabList:getSelected()
   if not tab then return end
 
-  jremove(tab.data, "borderIndex")
   local index = BorderPicker:getSelected()
-  if index ~= 1 then tab.data.borderIndex = index end
+  tab.data.borderIndex = index ~= 1 and index or nil
   updateBorder()
 end
 
@@ -161,9 +157,8 @@ function Callbacks.tabBackingSelect()
   local tab = TabList:getSelected()
   if not tab then return end
 
-  jremove(tab.data, "backingIndex")
   local index = BackingPicker:getSelected()
-  if index ~= 1 then tab.data.backingIndex = index end
+  tab.data.backingIndex = index ~= 1 and index or nil
   updateBacking()
 end
 
@@ -171,8 +166,7 @@ function Callbacks.tabBorderColor(color)
   local tab = TabList:getSelected()
   if not tab then return end
 
-  jremove(tab.data, "borderColor")
-  if color then tab.data.borderColor = color end
+  tab.data.borderColor = color
   updateBorder()
 end
 
@@ -180,8 +174,7 @@ function Callbacks.tabBackingColor(color)
   local tab = TabList:getSelected()
   if not tab then return end
 
-  jremove(tab.data, "backingColor")
-  if color then tab.data.backingColor = color end
+  tab.data.backingColor = color
   updateBacking()
 end
 

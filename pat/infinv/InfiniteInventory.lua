@@ -43,7 +43,6 @@ function init()
     local tab = createTab(tabData)
 
     if tabData.selected then selectedTab = tab end
-    jremove(tabData, "selected")
   end
 
   if not selectedTab then
@@ -124,9 +123,7 @@ end
 function save()
   local bags = jarray()
   for i, tab in ipairs(TabList.tabs) do
-    jremove(tab.data, "selected")
-    if tab:isSelected() then tab.data.selected = true end
-    
+    tab.data.selected = tab:isSelected() or nil
     bags[i] = tab.data
   end
 

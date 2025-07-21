@@ -74,7 +74,7 @@ function TabListWidget:newTab(data)
   table.insert(self.tabs, new)
   new.index = #self.tabs
   new.parent = self
-  new.data = data or jobject()
+  new.data = setmetatable(data or {}, nil)
   new:init()
 
   return new
