@@ -33,7 +33,7 @@ function update()
 end
 
 function open(withInventory)
-  paneId = (paneId or 0) + 1
+  paneId = os.clock()
   cfg._paneId = paneId
   cfg.openWithInventory = withInventory
   cfg.closeWithInventory = withInventory
