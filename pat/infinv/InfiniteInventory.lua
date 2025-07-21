@@ -20,10 +20,9 @@ PageScroller = ScrollInputWidget:new("gridLayout.pageScroller", Callbacks.pageSc
 PageBar = PageBarWidget:new("gridLayout.pageBar")
 
 local fmt = string.format
-local shared = getmetatable''
 
 function init()
-  shared.pat_infinv_dismiss = pane.dismiss
+  PaneId = config.getParameter("_paneId")
 
   TabList:init()
   ItemGrid:init()
@@ -56,6 +55,14 @@ function init()
 end
 
 function update(dt)
+  local playerId = player.id()
+  if playerId ~= 0 then
+    local shouldClose = world.sendEntityMessage(playerId, "pat_infinv_shouldClose", PaneId):result()
+    if shouldClose then
+      return pane.dismiss()
+    end
+  end
+
   Searcher:update(dt)
   ItemGrid:update(dt)
   PageBar:update()
@@ -111,7 +118,6 @@ function shiftItemFromInventory(item) -- osb
 end
 
 function uninit()
-  shared.pat_infinv_dismiss = nil
   save()
 end
 

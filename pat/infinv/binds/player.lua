@@ -1,47 +1,48 @@
 local cfg
-local shared = getmetatable''
+local paneId
+local openTicks
 
 function init()
   cfg = root.assetJson("/pat/infinv/infinv.config")
 
-  message.setHandler("pat_infinv_open", function(_, isLocal)
-    if isLocal then open() end
-  end)
-
-  if storage.restore then
-    open(storage.restore.inv)
-    jremove(storage, "restore")
+  local function setLocalHandler(name, func)
+    message.setHandler(name, function(_, isLocal, ...)
+      if isLocal then return func(...) end
+    end)
   end
-
-  if not input then
-    return script.setUpdateDelta(0)
-  end
+  setLocalHandler("pat_infinv_open", open)
+  setLocalHandler("pat_infinv_shouldClose", shouldClose)
 end
 
 function update()
-  if input.bindDown("pat_infinv", "open") then
-    open(false, true)
-  elseif input.bindDown("pat_infinv", "openWithInv") then
-    open(true)
+  if input then
+    if input.bindDown("pat_infinv", "open") then
+      open()
+    elseif input.bindDown("pat_infinv", "openWithInv") then
+      open(true)
+    end
+  end
+
+  if openTicks then
+    openTicks = openTicks - 1
+    if openTicks <= 0 then
+      openTicks = nil
+      player.interact("ScriptPane", cfg)
+    end
   end
 end
 
-function open(withInventory, toggle)
-  if shared.pat_infinv_dismiss then
-    pcall(shared.pat_infinv_dismiss)
-    shared.pat_infinv_dismiss = nil
-    if withInventory or toggle then return end
-  end
-
+function open(withInventory)
+  paneId = (paneId or 0) + 1
+  cfg._paneId = paneId
   cfg.openWithInventory = withInventory
   cfg.closeWithInventory = withInventory
-  player.interact("ScriptPane", cfg)
+  openTicks = 2
 end
 
-function uninit()
-  if shared.pat_infinv_dismiss then
-    pcall(shared.pat_infinv_dismiss)
-    shared.pat_infinv_dismiss = nil
-    storage.restore = { inv = cfg.openWithInventory }
-  end
+function shouldClose(id)
+  if not paneId or id == paneId then return false end
+  
+  openTicks = nil
+  return true
 end
