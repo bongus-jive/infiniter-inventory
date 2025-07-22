@@ -13,6 +13,8 @@ function InvData:load()
   if not data.unusedIds then data.unusedIds = jarray() end
   if not data.bags then data.bags = {} end
 
+  data.bagDefaults = setmetatable(data.bagDefaults or {}, nil)
+
   self.pages = {}
   self.newIds = {}
   self.unsavedIds = {}

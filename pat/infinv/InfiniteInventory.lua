@@ -205,6 +205,24 @@ function updateBacking()
   ItemGrid:setBackingImage(image)
 end
 
+function updateTabDefaultButtons()
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  local data = tab.data
+  local defaults = InvData.data.bagDefaults
+
+  local enabled = defaults.borderIndex ~= data.borderIndex
+    or defaults.borderColor ~= data.borderColor
+    or defaults.backingIndex ~= data.backingIndex
+    or defaults.backingColor ~= data.backingColor
+
+  widget.setButtonEnabled("editorLayout.editorTabs.tabs.border.setDefault", enabled)
+  widget.setButtonEnabled("editorLayout.editorTabs.tabs.backing.setDefault", enabled)
+  widget.setButtonEnabled("editorLayout.editorTabs.tabs.border.reset", enabled)
+  widget.setButtonEnabled("editorLayout.editorTabs.tabs.backing.reset", enabled)
+end
+
 function createTab(data)
   local tab = TabList:newTab(data)
   data = tab.data

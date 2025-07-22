@@ -2,7 +2,8 @@ Callbacks = {}
 
 -- footer buttons
 function Callbacks.newTabButton()
-  createTab():select()
+  local data = sb.jsonMerge(InvData.data.bagDefaults)
+  createTab(data):select()
   save()
 end
 
@@ -151,6 +152,7 @@ function Callbacks.tabBorderSelect()
   local index = BorderPicker:getSelected()
   tab.data.borderIndex = index ~= 1 and index or nil
   updateBorder()
+  updateTabDefaultButtons()
 end
 
 function Callbacks.tabBackingSelect()
@@ -160,6 +162,7 @@ function Callbacks.tabBackingSelect()
   local index = BackingPicker:getSelected()
   tab.data.backingIndex = index ~= 1 and index or nil
   updateBacking()
+  updateTabDefaultButtons()
 end
 
 function Callbacks.tabBorderColor(color)
@@ -168,6 +171,7 @@ function Callbacks.tabBorderColor(color)
 
   tab.data.borderColor = color
   updateBorder()
+  updateTabDefaultButtons()
 end
 
 function Callbacks.tabBackingColor(color)
@@ -175,6 +179,34 @@ function Callbacks.tabBackingColor(color)
   if not tab then return end
 
   tab.data.backingColor = color
+  updateBacking()
+  updateTabDefaultButtons()
+end
+
+function Callbacks.tabSetDefault()
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  local data = tab.data
+  local defaults = InvData.data.bagDefaults
+  defaults.borderIndex = data.borderIndex
+  defaults.borderColor = data.borderColor
+  defaults.backingIndex = data.backingIndex
+  defaults.backingColor = data.backingColor
+  updateTabDefaultButtons()
+end
+
+function Callbacks.tabResetToDefault()
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  local data = tab.data
+  local defaults = InvData.data.bagDefaults
+  data.borderIndex = defaults.borderIndex
+  data.borderColor = defaults.borderColor
+  data.backingIndex = defaults.backingIndex
+  data.backingColor = defaults.backingColor
+  updateBorder()
   updateBacking()
 end
 
@@ -208,6 +240,7 @@ function Callbacks.tabSelected(tab, oldTab)
 
   updateBorder()
   updateBacking()
+  updateTabDefaultButtons()
 
   local pageIndex = math.max(1, math.min(tab.data.pageIndex, #tab.data.pages))
   local items = InvData:getPageItems(tab.data.pages[pageIndex])
