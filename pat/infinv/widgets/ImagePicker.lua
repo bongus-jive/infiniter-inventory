@@ -67,7 +67,7 @@ function ImagePickerWidget:setSelected(index)
 end
 
 function ImagePickerWidget:getImage(index)
-  local image = self.images[index]
+  local image = self.images[index or 1] or self.images[1]
   return image and sb.replaceTags(image, self.imageTags) or ""
 end
 

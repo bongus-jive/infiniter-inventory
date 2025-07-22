@@ -206,12 +206,7 @@ function Callbacks.tabSelected(tab, oldTab)
   IconPicker:setSelected(tab.data.iconIndex)
   IconPicker:setIconSlotItem(tab.data.iconItem)
 
-  BorderPicker:setSelected(tab.data.borderIndex)
-  BorderColorbox:setText(tab.data.borderColor)
   updateBorder()
-  
-  BackingPicker:setSelected(tab.data.backingIndex)
-  BackingColorbox:setText(tab.data.backingColor)
   updateBacking()
 
   local pageIndex = math.max(1, math.min(tab.data.pageIndex, #tab.data.pages))

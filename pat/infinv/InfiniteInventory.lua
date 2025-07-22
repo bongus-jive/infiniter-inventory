@@ -183,9 +183,12 @@ function updateBorder()
   local tab = TabList:getSelected()
   if not tab then return end
   
-  BorderPicker:setTag("custom", tab.data.borderColor or "FFF")
-  local index = tab.data.borderIndex or 1
-  local image = BorderPicker:getImage(index)
+  local data = tab.data
+  BorderPicker:setSelected(data.borderIndex)
+  BorderPicker:setTag("custom", data.borderColor or "FFF")
+  BorderColorbox:setText(data.borderColor)
+
+  local image = BorderPicker:getImage(data.borderIndex)
   widget.setImage("border", image)
 end
 
@@ -193,9 +196,12 @@ function updateBacking()
   local tab = TabList:getSelected()
   if not tab then return end
 
-  BackingPicker:setTag("custom", tab.data.backingColor or "FFF")
-  local index = tab.data.backingIndex or 1
-  local image = BackingPicker:getImage(index)
+  local data = tab.data
+  BackingPicker:setSelected(data.backingIndex)
+  BackingPicker:setTag("custom", data.backingColor or "FFF")
+  BackingColorbox:setText(data.backingColor)
+
+  local image = BackingPicker:getImage(data.backingIndex)
   ItemGrid:setBackingImage(image)
 end
 
