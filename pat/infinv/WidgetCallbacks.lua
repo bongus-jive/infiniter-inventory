@@ -113,8 +113,11 @@ function Callbacks.tabIconSlot(item)
   local tab = TabList:getSelected()
   if not tab then return end
 
-  tab.data.iconItem = nil
-  if item then tab.data.iconItem = {name = item.name, parameters = item.parameters} end
+  if item then
+    jremove(item, "count")
+    if jsize(item.parameters) == 0 then jremove(item, "parameters") end
+  end
+  tab.data.iconItem = item
   updateTabIcon(tab)
 end
 
