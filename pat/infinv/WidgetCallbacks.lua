@@ -50,6 +50,10 @@ function Callbacks.quickStackButton()
   ItemGrid:quickStack()
 end
 
+function Callbacks.takeAllButton()
+  ItemGrid:takeAll()
+end
+
 function Callbacks.quickMoveCheckbox()
   ItemGrid:setQuickMove(widget.getChecked("gridLayout.quickMoveCheckbox"))
 end

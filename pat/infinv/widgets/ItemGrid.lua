@@ -404,6 +404,18 @@ function ItemGridWidget:quickStack()
   if hasStacked then self:setItems(items, true) end
 end
 
+function ItemGridWidget:takeAll()
+  local items = self:getItems()
+  for i = 1, self.slotCount do
+    local item = items[i]
+    if item then
+      player.giveItem(item)
+      items[i] = nil
+    end
+  end
+  self:setItems(items, true)
+end
+
 function ItemGridWidget:setBackingImage(image)
   for i = 1, self.slotCount do
     widget.setImage(self.slots[i].backingImage, image)
