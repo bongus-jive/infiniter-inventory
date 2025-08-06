@@ -211,8 +211,30 @@ function ItemGridWidget:rightClick(slot)
 end
 
 function ItemGridWidget:shiftHeld()
-  if not input then return false end
-  return input.key("LShift") or input.key("RShift")
+  if not input or not root.getConfigurationPath then
+    return false
+  end
+
+  local binds = root.getConfigurationPath("bindings.GuiShifting") or {}
+  local function keyHeld(key)
+    local success, result = pcall(input.key, key)
+    return success and result
+  end
+
+  local held = false
+  for _, bind in pairs(binds) do
+    if bind.type ~= "key" or not keyHeld(bind.value) then goto continue end
+    
+    for _, key in pairs(bind.mods or {}) do
+      if not keyHeld(key) then goto continue end
+    end
+
+    held = true
+    
+    ::continue::
+    if held then break end
+  end
+  return held
 end
 
 function ItemGridWidget:setQuickMove(v)
