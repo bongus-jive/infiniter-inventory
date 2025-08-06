@@ -9,7 +9,7 @@ function ScrollInputWidget:new(name, callback)
   return new
 end
 
-function ScrollInputWidget:init(name, callback)
+function ScrollInputWidget:init()
   self.position = {0, 0}
   self.size = widget.getSize(self.widgetName)
   self._skip = 3
