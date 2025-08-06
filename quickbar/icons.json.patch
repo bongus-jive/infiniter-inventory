@@ -6,7 +6,7 @@
       "label": "^#ff80ce;Infinite Inventory",
       "icon": "/pat/infinv/images/icon.png",
       "weight": -665.9,
-      "action": [ "pane", { "type": "message", "config": { "messageType": "pat_infinv_open", "messageArgs": [ ] } } ]
+      "action": [ "exec", "/pat/infinv/binds/quickbar.lua" ]
     }
   }
 ]
