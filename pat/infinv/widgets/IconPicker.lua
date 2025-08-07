@@ -17,7 +17,7 @@ function IconPickerWidget:init()
 end
 
 function IconPickerWidget:buildList()
-  local item = self:addItem("", -1)
+  local item = self:addItem(-1)
 
   widget.addChild(item.name, self.data.iconSlotTemplate, "slot")
   self.iconSlot = fmt("%s.slot", item.name)
@@ -28,11 +28,11 @@ function IconPickerWidget:buildList()
   ImagePickerWidget.buildList(self)
 end
 
-function IconPickerWidget:getImage(key, index, item)
+function IconPickerWidget:getImage(index, item)
   if index == -1 then
     return self:getItemIcon(item)
   end
-  return ImagePickerWidget.getImage(self, key, index)
+  return ImagePickerWidget.getImage(self, index)
 end
 
 function IconPickerWidget:getIconSlotItem()

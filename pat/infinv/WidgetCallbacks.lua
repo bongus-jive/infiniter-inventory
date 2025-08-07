@@ -109,9 +109,7 @@ function Callbacks.tabIconSelect()
   local tab = TabList:getSelected()
   if not tab then return end
 
-  local key, index = IconPicker:getSelected()
-  if key == "" then key = nil end
-  tab.data.iconKey, tab.data.iconIndex = key, index
+  tab.data.iconIndex = IconPicker:getSelected()
   updateTabIcon(tab)
 end
 
@@ -158,8 +156,7 @@ function Callbacks.tabBorderSelect()
   local tab = TabList:getSelected()
   if not tab then return end
 
-  local key, index = BorderPicker:getSelected()
-  tab.data.borderKey = key ~= "" and key or nil
+  local index = BorderPicker:getSelected()
   tab.data.borderIndex = index ~= 1 and index or nil
   updateBorder()
   updateTabDefaultButtons()
@@ -169,8 +166,7 @@ function Callbacks.tabBackingSelect()
   local tab = TabList:getSelected()
   if not tab then return end
 
-  local key, index = BackingPicker:getSelected()
-  tab.data.backingKey = key ~= "" and key or nil
+  local index = BackingPicker:getSelected()
   tab.data.backingIndex = index ~= 1 and index or nil
   updateBacking()
   updateTabDefaultButtons()
@@ -200,10 +196,8 @@ function Callbacks.tabSetDefault()
 
   local data = tab.data
   local defaults = InvData.data.bagDefaults
-  defaults.borderKey = data.borderKey
   defaults.borderIndex = data.borderIndex
   defaults.borderColor = data.borderColor
-  defaults.backingKey = data.backingKey
   defaults.backingIndex = data.backingIndex
   defaults.backingColor = data.backingColor
   updateTabDefaultButtons()
@@ -215,10 +209,8 @@ function Callbacks.tabResetToDefault()
 
   local data = tab.data
   local defaults = InvData.data.bagDefaults
-  data.borderKey = defaults.borderKey
   data.borderIndex = defaults.borderIndex
   data.borderColor = defaults.borderColor
-  data.backingKey = defaults.backingKey
   data.backingIndex = defaults.backingIndex
   data.backingColor = defaults.backingColor
   updateBorder()
@@ -250,7 +242,7 @@ function Callbacks.tabSelected(tab, oldTab)
     return
   end
 
-  IconPicker:setSelected(tab.data.iconKey, tab.data.iconIndex)
+  IconPicker:setSelected(tab.data.iconIndex)
   IconPicker:setIconSlotItem(tab.data.iconItem)
 
   updateBorder()

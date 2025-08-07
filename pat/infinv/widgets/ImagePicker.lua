@@ -28,23 +28,24 @@ function ImagePickerWidget:buildList()
   for _, group in ipairs(images) do
     if type(group) == "string" then
       legacyCount = legacyCount + 1
-      self:addItem("__legacy", legacyCount, group)
+      self:addItem(legacyCount, "__legacy", group)
     else
       for i, image in ipairs(group.images) do
-        self:addItem(group.group, i, image)
+        self:addItem(i, group.group, image)
       end
     end
   end
 end
 
-function ImagePickerWidget:addItem(key, index, image)
+function ImagePickerWidget:addItem(index, group, image)
+  if group and group:len() > 0 then index = fmt("%s:%s", group, index) end
+
   local item = {}
   item.id = widget.addListItem(self.widgetName)
-  item.key = key
   item.index = index
   item.name = fmt("%s.%s", self.widgetName, item.id)
   item.iconName = fmt("%s.icon", item.name)
-  widget.setData(fmt("%s.button", item.name), { parent = self.widgetName, key = key, index = index })
+  widget.setData(fmt("%s.button", item.name), { parent = self.widgetName, index = index })
 
   if image then
     item.baseImage = image
@@ -56,30 +57,24 @@ function ImagePickerWidget:addItem(key, index, image)
     end
   end
 
-  if not self.items[key] then self.items[key] = {} end
-  self.items[key][index] = item
+  self.items[index] = item
   self.itemIds[item.id] = item
   return item
-end
-
-function ImagePickerWidget:getListItem(key, index)
-  local group = self.items[key] or self.items[""]
-  return group[index] or group[1]
 end
 
 function ImagePickerWidget:getSelected()
   local id = widget.getListSelected(self.widgetName)
   local item = self.itemIds[id]
-  return item.key, item.index, item.special
+  return item.index, item.special
 end
 
-function ImagePickerWidget:setSelected(key, index)
-  local item = self:getListItem(key, index)
+function ImagePickerWidget:setSelected(index)
+  local item = self.items[index] or self.items[1]
   widget.setListSelected(self.widgetName, item.id)
 end
 
-function ImagePickerWidget:getImage(key, index)
-  local item = self:getListItem(key, index)
+function ImagePickerWidget:getImage(index)
+  local item = self.items[index] or self.items[1]
   return item.baseImage and sb.replaceTags(item.baseImage, self.imageTags) or ""
 end
 

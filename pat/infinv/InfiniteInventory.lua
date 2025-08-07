@@ -168,7 +168,7 @@ end
 function updateTabIcon(tab)
   if not tab then return end
 
-  local image = IconPicker:getImage(tab.data.iconKey, tab.data.iconIndex, tab.data.iconItem)
+  local image = IconPicker:getImage(tab.data.iconIndex, tab.data.iconItem)
   local rot = tab.data.iconRotation
   if rot then rot = rot * (math.pi / 180) end
 
@@ -180,11 +180,11 @@ function updateBorder()
   if not tab then return end
   
   local data = tab.data
-  BorderPicker:setSelected(data.borderKey, data.borderIndex)
+  BorderPicker:setSelected(data.borderIndex)
   BorderPicker:setTag("custom", data.borderColor or "FFF")
   BorderColorbox:setText(data.borderColor)
 
-  local image = BorderPicker:getImage(data.borderKey, data.borderIndex)
+  local image = BorderPicker:getImage(data.borderIndex)
   widget.setImage("border", image)
 end
 
@@ -193,11 +193,11 @@ function updateBacking()
   if not tab then return end
 
   local data = tab.data
-  BackingPicker:setSelected(data.backingKey, data.backingIndex)
+  BackingPicker:setSelected(data.backingIndex)
   BackingPicker:setTag("custom", data.backingColor or "FFF")
   BackingColorbox:setText(data.backingColor)
 
-  local image = BackingPicker:getImage(data.backingKey, data.backingIndex)
+  local image = BackingPicker:getImage(data.backingIndex)
   ItemGrid:setBackingImage(image)
 end
 
@@ -208,10 +208,8 @@ function updateTabDefaultButtons()
   local data = tab.data
   local defaults = InvData.data.bagDefaults
 
-  local enabled = defaults.borderKey ~= data.borderKey
-    or defaults.borderIndex ~= data.borderIndex
+  local enabled = defaults.borderIndex ~= data.borderIndex
     or defaults.borderColor ~= data.borderColor
-    or defaults.backingKey ~= data.backingKey
     or defaults.backingIndex ~= data.backingIndex
     or defaults.backingColor ~= data.backingColor
 
