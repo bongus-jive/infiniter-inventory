@@ -1,12 +1,17 @@
 [
-  "/pat/infinv/images/slots/empty.png",
-  "/pat/infinv/images/slots/empty.png?replace;505050=805050",
-  "/pat/infinv/images/slots/empty.png?replace;505050=806550",
-  "/pat/infinv/images/slots/empty.png?replace;505050=808050",
-  "/pat/infinv/images/slots/empty.png?replace;505050=508050",
-  "/pat/infinv/images/slots/empty.png?replace;505050=507080",
-  "/pat/infinv/images/slots/empty.png?replace;505050=605080",
-  "/pat/infinv/images/slots/empty.png?replace;505050=805070",
-  "/pat/infinv/images/slots/empty.png?replace;505050=808080",
-  "/pat/infinv/images/slots/empty.png?replace;505050=<custom>"
+  {
+    "group": "",
+    "images": [
+      "/pat/infinv/images/slots/empty.png",
+      "/pat/infinv/images/slots/empty.png?replace;505050=805050",
+      "/pat/infinv/images/slots/empty.png?replace;505050=806550",
+      "/pat/infinv/images/slots/empty.png?replace;505050=808050",
+      "/pat/infinv/images/slots/empty.png?replace;505050=508050",
+      "/pat/infinv/images/slots/empty.png?replace;505050=507080",
+      "/pat/infinv/images/slots/empty.png?replace;505050=605080",
+      "/pat/infinv/images/slots/empty.png?replace;505050=805070",
+      "/pat/infinv/images/slots/empty.png?replace;505050=808080",
+      "/pat/infinv/images/slots/empty.png?replace;505050=<custom>"
+    ]
+  }
 ]

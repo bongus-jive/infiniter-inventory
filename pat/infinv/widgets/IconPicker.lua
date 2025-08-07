@@ -17,18 +17,22 @@ function IconPickerWidget:init()
 end
 
 function IconPickerWidget:buildList()
-  local item = self:addItem(-1)
+  local item = self:addItem("", -1)
+
   widget.addChild(item.name, self.data.iconSlotTemplate, "slot")
   self.iconSlot = fmt("%s.slot", item.name)
+
+  local button = fmt("%s.button", item.name)
+  widget.setData(button, sb.jsonMerge(widget.getData(button), self.data.iconSlotData))
 
   ImagePickerWidget.buildList(self)
 end
 
-function IconPickerWidget:getImage(index, item)
+function IconPickerWidget:getImage(key, index, item)
   if index == -1 then
     return self:getItemIcon(item)
   end
-  return ImagePickerWidget.getImage(self, index)
+  return ImagePickerWidget.getImage(self, key, index)
 end
 
 function IconPickerWidget:getIconSlotItem()

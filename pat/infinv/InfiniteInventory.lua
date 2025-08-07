@@ -80,7 +80,7 @@ end
 function createTooltip(pos)
   local child = widget.getChildAt(pos)
   if not child then return end
-  if child:sub(1, 1) == "." then child = child:sub(2, -1) end
+  if child:sub(1, 1) == "." then child = child:sub(2) end
 
   if Strings.tooltips[child] then
     return Strings.tooltips[child]
@@ -96,10 +96,6 @@ function createTooltip(pos)
   if data.parent == TabList.widgetName then
     local tab = TabList.tabs[data.index]
     return tab and tab.data.label
-  end
-  
-  if data.parent == IconPicker.widgetName and data.index == -1 then
-    return Strings.tooltips.tabIconSlot
   end
 end
 
@@ -172,7 +168,7 @@ end
 function updateTabIcon(tab)
   if not tab then return end
 
-  local image = IconPicker:getImage(tab.data.iconIndex, tab.data.iconItem)
+  local image = IconPicker:getImage(tab.data.iconKey, tab.data.iconIndex, tab.data.iconItem)
   local rot = tab.data.iconRotation
   if rot then rot = rot * (math.pi / 180) end
 
@@ -184,11 +180,11 @@ function updateBorder()
   if not tab then return end
   
   local data = tab.data
-  BorderPicker:setSelected(data.borderIndex)
+  BorderPicker:setSelected(data.borderKey, data.borderIndex)
   BorderPicker:setTag("custom", data.borderColor or "FFF")
   BorderColorbox:setText(data.borderColor)
 
-  local image = BorderPicker:getImage(data.borderIndex)
+  local image = BorderPicker:getImage(data.borderKey, data.borderIndex)
   widget.setImage("border", image)
 end
 
@@ -197,11 +193,11 @@ function updateBacking()
   if not tab then return end
 
   local data = tab.data
-  BackingPicker:setSelected(data.backingIndex)
+  BackingPicker:setSelected(data.backingKey, data.backingIndex)
   BackingPicker:setTag("custom", data.backingColor or "FFF")
   BackingColorbox:setText(data.backingColor)
 
-  local image = BackingPicker:getImage(data.backingIndex)
+  local image = BackingPicker:getImage(data.backingKey, data.backingIndex)
   ItemGrid:setBackingImage(image)
 end
 
@@ -212,8 +208,10 @@ function updateTabDefaultButtons()
   local data = tab.data
   local defaults = InvData.data.bagDefaults
 
-  local enabled = defaults.borderIndex ~= data.borderIndex
+  local enabled = defaults.borderKey ~= data.borderKey
+    or defaults.borderIndex ~= data.borderIndex
     or defaults.borderColor ~= data.borderColor
+    or defaults.backingKey ~= data.backingKey
     or defaults.backingIndex ~= data.backingIndex
     or defaults.backingColor ~= data.backingColor
 
