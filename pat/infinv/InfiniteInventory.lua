@@ -23,6 +23,7 @@ local fmt = string.format
 
 function init()
   PaneId = config.getParameter("_paneId")
+  restorePosition()
 
   TabList:init()
   ItemGrid:init()
@@ -114,6 +115,7 @@ end
 
 function uninit()
   save()
+  storePosition()
 end
 
 function save()
@@ -283,4 +285,23 @@ function getMaxPages()
   if next(lastPageItems) then maxPages = maxPages + 1 end
 
   return maxPages
+end
+
+function storePosition()
+  if not pane.getPosition or not root.setConfiguration then return end
+  root.setConfiguration("pat_infinv_position", pane.getPosition())
+end
+
+function restorePosition()
+  if not pane.setPosition or not root.getConfiguration or not pane.getSize or not interface.bindCanvas then return end
+
+  local pos = root.getConfiguration("pat_infinv_position")
+  if not pos then return end
+
+  local size = pane.getSize()
+  local bounds = interface.bindCanvas("voice"):size()
+  pos[1] = math.max(0, math.min(pos[1], bounds[1] - size[1]))
+  pos[2] = math.max(0, math.min(pos[2], bounds[2] - size[2]))
+  
+  pane.setPosition(pos)
 end
