@@ -73,16 +73,12 @@ function ItemGridWidget:setSlotItem(slot, item, skipCallback)
 
   if self.callback and not skipCallback then self.callback(slot) end
 
+  widget.setVisible(slot.backingImage, item == nil or self.showBackingImageWhenFull)
   widget.setVisible(slot.countLabel, item ~= nil)
   if item then
-    widget.setVisible(slot.backingImage, self.data.showBackingImageWhenFull or false)
-  else
-    widget.setVisible(slot.backingImage, self.data.showBackingImageWhenEmpty or true)
-    return
+    local count = self:countToString(item.count)
+    widget.setText(slot.countLabel, count)
   end
-
-  local count = self:countToString(item.count)
-  widget.setText(slot.countLabel, count)
 end
 
 function ItemGridWidget:addItem(inputItem)
@@ -426,6 +422,16 @@ function ItemGridWidget:setBackingImage(image)
   for i = 0, self.data.highlight.frames - 1 do
     local frame = sb.replaceTags(hl.image, {frame = tostring(i), backing = image})
     self.highlightFrames[i] = frame
+  end
+end
+
+function ItemGridWidget:setBackingAffinity(full)
+  full = not not full
+  self.showBackingImageWhenFull = full
+
+  local items = self:getItems()
+  for i = 1, self.slotCount do
+    widget.setVisible(self.slots[i].backingImage, items[i] == nil or full)
   end
 end
 

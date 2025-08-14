@@ -1,0 +1,10 @@
+{
+  "frameGrid": {
+    "size": [ 11, 11 ],
+    "dimensions": [ 3, 2 ],
+    "names": [
+      [ "base", "hover", "press" ],
+      [ "baseChecked", "hoverChecked", "pressChecked" ]
+    ]
+  }
+}

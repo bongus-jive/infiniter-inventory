@@ -201,6 +201,9 @@ function updateBacking()
 
   local image = BackingPicker:getImage(data.backingIndex)
   ItemGrid:setBackingImage(image)
+
+  widget.setChecked("editorLayout.editorTabs.tabs.backing.fullCheckbox", data.backingWhenFull or false)
+  ItemGrid:setBackingAffinity(data.backingWhenFull)
 end
 
 function updateTabDefaultButtons()
@@ -214,6 +217,7 @@ function updateTabDefaultButtons()
     or defaults.borderColor ~= data.borderColor
     or defaults.backingIndex ~= data.backingIndex
     or defaults.backingColor ~= data.backingColor
+    or defaults.backingWhenFull ~= data.backingWhenFull
 
   widget.setButtonEnabled("editorLayout.editorTabs.tabs.border.setDefault", enabled)
   widget.setButtonEnabled("editorLayout.editorTabs.tabs.backing.setDefault", enabled)

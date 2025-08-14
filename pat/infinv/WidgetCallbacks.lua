@@ -190,6 +190,15 @@ function Callbacks.tabBackingColor(color)
   updateTabDefaultButtons()
 end
 
+function Callbacks.tabBackingFullCheckbox()
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  tab.data.backingWhenFull = not tab.data.backingWhenFull or nil
+  updateBacking()
+  updateTabDefaultButtons()
+end
+
 function Callbacks.tabSetDefault()
   local tab = TabList:getSelected()
   if not tab then return end
@@ -200,6 +209,7 @@ function Callbacks.tabSetDefault()
   defaults.borderColor = data.borderColor
   defaults.backingIndex = data.backingIndex
   defaults.backingColor = data.backingColor
+  defaults.backingWhenFull = data.backingWhenFull
   updateTabDefaultButtons()
 end
 
@@ -213,8 +223,10 @@ function Callbacks.tabResetToDefault()
   data.borderColor = defaults.borderColor
   data.backingIndex = defaults.backingIndex
   data.backingColor = defaults.backingColor
+  data.backingWhenFull = defaults.backingWhenFull
   updateBorder()
   updateBacking()
+  updateTabDefaultButtons()
 end
 
 -- the rest
