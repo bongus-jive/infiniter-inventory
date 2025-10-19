@@ -68,6 +68,7 @@ end
 
 function Searcher:highlightResults()
   self:clearHighlights()
+  ItemGrid:enableHighlights()
 
   local currentTab = TabList:getSelected()
   local currentIndex, currentId

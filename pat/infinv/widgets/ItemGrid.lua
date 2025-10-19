@@ -28,6 +28,7 @@ function ItemGridWidget:init()
     slot.itemSlot = fmt("%s.slot", slot.name)
     slot.countLabel = fmt("%s.count", slot.name)
     slot.backingImage = fmt("%s.backing", slot.name)
+    slot.dimmedImage = fmt("%s.dimmed", slot.name)
     slot.highlightImage = fmt("%s.highlight", slot.name)
     self.slots[i] = slot
     widget.setData(slot.itemSlot, slot.index)
@@ -413,14 +414,20 @@ function ItemGridWidget:takeAll()
 end
 
 function ItemGridWidget:setBackingImage(image)
+  local tags = {backing = image}
+
+  local dim = sb.replaceTags(self.data.dimmedImage, tags)
   for i = 1, self.slotCount do
-    widget.setImage(self.slots[i].backingImage, image)
+    local slot = self.slots[i]
+    widget.setImage(slot.backingImage, image)
+    widget.setImage(slot.dimmedImage, dim)
   end
 
   self.highlightFrames = {}
   local hl = self.data.highlight
   for i = 0, self.data.highlight.frames - 1 do
-    local frame = sb.replaceTags(hl.image, {frame = tostring(i), backing = image})
+    tags.frame = tostring(i)
+    local frame = sb.replaceTags(hl.image, tags)
     self.highlightFrames[i] = frame
   end
 end
@@ -435,15 +442,33 @@ function ItemGridWidget:setBackingAffinity(full)
   end
 end
 
-function ItemGridWidget:resetHighlighted()
+function ItemGridWidget:enableHighlights()
+  if self.highlighting then return end
+  self.highlighting = true
+
   for i = 1, self.slotCount do
-    widget.setVisible(self.slots[i].highlightImage, false)
+    self:setSlotHighlighted(i, false)
+  end
+end
+
+function ItemGridWidget:resetHighlighted()
+  self.highlighting = false
+  
+  for i = 1, self.slotCount do
+    local slot = self.slots[i]
+    widget.setVisible(slot.highlightImage, false)
+    widget.setVisible(slot.dimmedImage, false)
+    widget.setFontColor(slot.countLabel, self.data.countColor)
   end
 end
 
 function ItemGridWidget:setSlotHighlighted(slot, enabled)
+  if not self.highlighting then self:enableHighlighting() end
+
   if type(slot) == "number" then slot = self.slots[slot] end
   if not slot then return end
 
   widget.setVisible(slot.highlightImage, enabled)
+  widget.setVisible(slot.dimmedImage, not enabled)
+  widget.setFontColor(slot.countLabel, enabled and self.data.countColor or self.data.countColorDim)
 end
