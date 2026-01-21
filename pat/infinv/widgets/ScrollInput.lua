@@ -18,6 +18,7 @@ function ScrollInputWidget:init()
   self.wheelUp = fmt("%s.wheel.up", self.widgetName)
   self.wheelTarget = fmt("%s.wheel.target", self.widgetName)
 
+  widget.removeAllChildren(self.widgetName)
   widget.addChild(self.widgetName, {type = "widget", size = {self.size[1], 1}}, "origin")
   self:createWheel()
 end
