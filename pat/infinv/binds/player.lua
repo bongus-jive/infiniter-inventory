@@ -1,10 +1,7 @@
-local cfg
-local paneId
-local openTicks
+local cfg = { baseConfig = "/pat/infinv/infinv.config" }
+local paneId, openTicks
 
 function init()
-  cfg = root.assetJson("/pat/infinv/infinv.config")
-
   local function setLocalHandler(name, func)
     message.setHandler(name, function(_, isLocal, ...)
       if isLocal then return func(...) end
