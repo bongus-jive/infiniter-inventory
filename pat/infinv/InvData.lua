@@ -115,6 +115,8 @@ function InvData:expandItems(items)
       items[i] = { name = item, count = 1, parameters = {} }
     elseif item[1] then
       items[i] = { name = item[1], count = item[2] or 1, parameters = item[3] or {} }
+    elseif item.item then
+      item.name = item.item; jremove(item, "item")
     end
   end
 end
