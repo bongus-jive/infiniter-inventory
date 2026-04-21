@@ -1,13 +1,14 @@
 InvData = {}
 
-local INV_ID = "pat-infiniteinventory"
-local PAGE_ID = "pat-infiniteinventory-page"
-local PAGE_NAME = "pat-infiniteinventory-%s"
+local INV_PROP = "pat-infiniteinventory"
+local PAGE_PROP = INV_PROP.."-%s"
+local INV_VER = "pat-infiniteinventory"
+local PAGE_VER = "pat-infiniteinventory-page"
 local fmt = string.format
 
 function InvData:load()
-  local vJson = player.getProperty(INV_ID)
-  local data = vJson and root.loadVersionedJson(vJson, INV_ID) or {}
+  local vJson = player.getProperty(INV_PROP)
+  local data = vJson and root.loadVersionedJson(vJson, INV_VER) or {}
   self.data = data
   
   if not data.unusedIds then data.unusedIds = jarray() end
@@ -40,13 +41,13 @@ function InvData:save(bags)
     table.insert(self.data.unusedIds, id)
   end
 
-  local vJson = root.makeCurrentVersionedJson(INV_ID, self.data)
-  player.setProperty(INV_ID, vJson)
+  local vJson = root.makeCurrentVersionedJson(INV_VER, self.data)
+  player.setProperty(INV_PROP, vJson)
 
   for _, id in pairs(self.unsavedIds) do
     local items = self.pages[id]
-    local data = items and root.makeCurrentVersionedJson(PAGE_ID, items) or nil
-    player.setProperty(fmt(PAGE_NAME, id), data)
+    local data = items and root.makeCurrentVersionedJson(PAGE_VER, items) or nil
+    player.setProperty(fmt(PAGE_PROP, id), data)
   end
   self.unsavedIds = {}
 end
@@ -81,12 +82,13 @@ function InvData:getPageItems(id)
   end
 
   local items
-  local vJson = player.getProperty(fmt(PAGE_NAME, id), "undefined")
+  local vJson = player.getProperty(fmt(PAGE_PROP, id), "undefined")
   if vJson == "undefined" then
     self.newIds[id] = true
     items = jarray()
   else
-    items = vJson and root.loadVersionedJson(vJson, PAGE_ID) or jarray()
+    items = vJson and root.loadVersionedJson(vJson, PAGE_VER) or jarray()
+    self:expandItems(items)
   end
 
   self.pages[id] = items
@@ -102,4 +104,17 @@ function InvData:setPageItems(id, items)
   
   self.newIds[id] = nil
   table.insert(self.unsavedIds, id)
+end
+
+
+function InvData:expandItems(items)
+  if not items then return end
+  
+  for i, item in pairs(items) do
+    if type(item) == "string" then
+      items[i] = { name = item, count = 1, parameters = {} }
+    elseif item[1] then
+      items[i] = { name = item[1], count = item[2] or 1, parameters = item[3] or {} }
+    end
+  end
 end
