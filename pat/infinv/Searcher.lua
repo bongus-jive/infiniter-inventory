@@ -24,13 +24,18 @@ function Searcher:start(text, goToResult)
   text = text:lower()
 
   self.goToResult = goToResult
-  if self.currentSearch == text then
+  if self.currentText == text then
     if goToResult then self:nextResult() end
     return
   end
 
-  self.currentSearch = text
   self.searchedPages = {}
+  self.colonyTags = {}
+  self.currentText = text
+  self.currentSearch = text:gsub("#([^%s]+)%s?", function(tag)
+    table.insert(self.colonyTags, tag)
+    return ""
+  end)
 
   self.searchThread = coroutine.create(self.searchAllPages)
   local success, result = coroutine.resume(self.searchThread, self)
@@ -44,10 +49,12 @@ function Searcher:typing(text)
 end
 
 function Searcher:reset()
+  self.typingText = nil
+  self.currentText = nil
   self.currentSearch = nil
   self.searchThread = nil
-  self.typingText = nil
   self.searchedPages = {}
+  self.colonyTags = {}
   self:clearHighlights()
 end
 
@@ -158,13 +165,20 @@ function Searcher:searchItem(item)
   if not item then return false end
 
   local text = self.currentSearch
+  local params = item.parameters
+  local cfg
 
+  if self.colonyTags[1] then
+    if root.itemType(item.name) ~= "object" then return false end
+    cfg = root.itemConfig(item).config
+    if not self:checkTags(self.colonyTags, params.colonyTags or cfg.colonyTags) then return false end
+  end
+  
   if item.name:lower():find(text, nil, true) then
     return true
   end
 
-  local cfg = root.itemConfig(item).config
-  local params = item.parameters
+  if not cfg then cfg = root.itemConfig(item).config end
 
   local shortdesc = params.shortdescription or cfg.shortdescription or ""
   shortdesc = shortdesc:gsub("(%b^;)", ""):lower()
@@ -179,6 +193,18 @@ function Searcher:searchItem(item)
   end
 
   return false
+end
+
+function Searcher:checkTags(list, tags)
+  if not tags or #tags == 0 then return false end
+
+  local set = {}
+  for _, v in ipairs(tags) do set[v:lower()] = true end
+  for _, v in ipairs(list) do
+    if not set[v] then return false end
+  end
+
+  return true
 end
 
 function Searcher:searchAllPages()
