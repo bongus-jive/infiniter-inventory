@@ -17,23 +17,24 @@ function ScrollInputWidget:init()
   self.wheelUp = fmt("%s.wheel.up", self.widgetName)
   self.wheelTarget = fmt("%s.wheel.target", self.widgetName)
 
+  self.wheelConfig = {
+    type = "scrollArea",
+    size = self.size,
+    verticalScroll = false,
+    children = {
+      target = { type = "widget", size = {self.size[1], 1} },
+      up = { type = "widget", size = {self.size[1], 1000} }
+    }
+  }
+
   widget.removeAllChildren(self.widgetName)
-  widget.addChild(self.widgetName, {type = "widget", size = {self.size[1], 1}}, "origin")
+  widget.addChild(self.widgetName, { type = "widget", size = {self.size[1], 1} }, "origin")
   self:createWheel()
 end
 
 function ScrollInputWidget:createWheel()
   widget.removeChild(self.widgetName, "wheel")
-  local cfg = {
-    type = "scrollArea",
-    size = self.size,
-    verticalScroll = false,
-    children = {
-      target = { type = "widget", size = {self.size[1], 1}},
-      up = { type = "widget", size = {self.size[1], 1000}}
-    }
-  }
-  widget.addChild(self.widgetName, cfg, "wheel")
+  widget.addChild(self.widgetName, self.wheelConfig, "wheel")
   self.active = false
 end
 
