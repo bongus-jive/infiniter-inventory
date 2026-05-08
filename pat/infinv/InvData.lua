@@ -45,7 +45,7 @@ function InvData:save(bags)
   player.setProperty(INV_PROP, vJson)
 
   for _, id in pairs(self.unsavedIds) do
-    local items = self.pages[id]
+    local items = self:squishItems(self.pages[id])
     local data = items and root.makeCurrentVersionedJson(PAGE_VER, items) or nil
     player.setProperty(fmt(PAGE_PROP, id), data)
   end
@@ -106,6 +106,25 @@ function InvData:setPageItems(id, items)
   table.insert(self.unsavedIds, id)
 end
 
+
+function InvData:squishItems(items)
+  if not items then return end
+
+  local newItems = jarray()
+  jresize(newItems, jsize(items))
+
+  for i, item in pairs(items) do
+    if jsize(item.parameters) > 0 then
+      newItems[i] = item
+    elseif item.count > 1 then
+      newItems[i] = { item.name, item.count }
+    else
+      newItems[i] = item.name
+    end
+  end
+
+  return newItems
+end
 
 function InvData:expandItems(items)
   if not items then return end
