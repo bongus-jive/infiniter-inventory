@@ -41,6 +41,16 @@ end
 function ScrollInputWidget:update(mousePos)
   if not widget.inMember(self.widgetName, mousePos) then return end
 
+  if input then -- se/osb
+    for _, event in ipairs(input.events()) do
+      if event.type == "MouseWheel" then
+        self.callback(event.data.mouseWheel > 0)
+        break
+      end
+    end
+    return
+  end
+
   if not widget.inMember(self.origin, self.position) then
     self.position = self:findOrigin(mousePos)
   end
