@@ -88,7 +88,7 @@ function InvData:getPageItems(id)
     items = jarray()
   else
     items = vJson and root.loadVersionedJson(vJson, PAGE_VER) or jarray()
-    self:expandItems(items)
+    self:createItems(items)
   end
 
   self.pages[id] = items
@@ -126,16 +126,10 @@ function InvData:squishItems(items)
   return newItems
 end
 
-function InvData:expandItems(items)
+function InvData:createItems(items)
   if not items then return end
   
   for i, item in pairs(items) do
-    if type(item) == "string" then
-      items[i] = { name = item, count = 1, parameters = {} }
-    elseif item[1] then
-      items[i] = { name = item[1], count = item[2] or 1, parameters = item[3] or {} }
-    elseif item.item then
-      item.name = item.item; jremove(item, "item")
-    end
+    items[i] = root.createItem(item)
   end
 end
