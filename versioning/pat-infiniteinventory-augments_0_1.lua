@@ -202,6 +202,8 @@ function update(data)
   local applied = false
 
   if instance.scripts then
+    self = {}
+    _PAT_II = true
     update, versioning, celestial = nil, nil, nil
     
     makeCallbacks(augmentItem, instance, augmentConfig.directory)
