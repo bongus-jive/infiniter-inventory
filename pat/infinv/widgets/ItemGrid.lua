@@ -178,7 +178,17 @@ function ItemGridWidget:rightClick(slot)
   if not slotItem then return end
   
   local swapItem = player.swapSlotItem()
-  if swapItem and not root.itemDescriptorsMatch(slotItem, swapItem, true) then return end
+  if swapItem and not root.itemDescriptorsMatch(slotItem, swapItem, true) then
+    if root.itemType(swapItem.name) == "augmentitem" then
+      local newItem, newAugment = self:applyAugment(slotItem, swapItem)
+      if newItem then
+        self:setSlotItem(slot, newItem)
+        player.setSwapSlotItem(newAugment)
+      end
+    end
+    
+    return
+  end
 
   local maxStack = self:getMaxStack(slotItem)
   if swapItem and swapItem.count >= maxStack then return end
@@ -205,6 +215,19 @@ function ItemGridWidget:rightClick(slot)
   else
     player.setSwapSlotItem(swapItem)
   end
+end
+
+function ItemGridWidget:applyAugment(item, augment)
+  local vj = { id = "pat-infiniteinventory-augments", version = 0, content = { item, augment } }
+  local success, result = pcall(root.loadVersionedJson, vj, vj.id)
+
+  if not success then
+    -- sb.logError(result)
+    return pane.playSound("/sfx/interface/clickon_error.ogg")
+  end
+
+  if not result[1] then return end
+  return result[2], result[3]
 end
 
 function ItemGridWidget:shiftHeld()
