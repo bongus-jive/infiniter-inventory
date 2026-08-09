@@ -3,7 +3,7 @@ local function absolutePath(directory, file)
   return file
 end
 
-local function makeCallbacks(itemDesc, itemConfig, instance)
+local function makeCallbacks(itemDesc, instance, directory)
   local rand = sb.makeRandomSource()
 
   config = {}
@@ -56,7 +56,7 @@ local function makeCallbacks(itemDesc, itemConfig, instance)
     return math.max(0, math.floor(instance.fuelAmount or 0)) end
 
   function item.largeImage()
-    return absolutePath(itemConfig.directory, instance.largeImage) end
+    return instance.largeImage and absolutePath(directory, instance.largeImage) or "" end
 
   function item.tooltipKind()
     return instance.tooltipKind or "" end
@@ -67,7 +67,7 @@ local function makeCallbacks(itemDesc, itemConfig, instance)
   function item.pickupSound()
     local sounds = instance.pickupSounds or {}
     if #sounds == 0 then sounds = root.assetJson("/items/defaultParameters.config:pickupSounds") end
-    return sounds[rand:randUInt(#sounds)]
+    return sounds[rand:randUInt(1, #sounds)]
   end
 
   function item.twoHanded()
@@ -78,11 +78,11 @@ local function makeCallbacks(itemDesc, itemConfig, instance)
 
   function item.learnBlueprintsOnPickup()
     if not instance.learnBlueprintsOnPickup then return {} end
-    local list = jarray()
+    local list = {}
     for i, blue in ipairs(instance.learnBlueprintsOnPickup) do
-      list[i] = root.createItem(blue)
+      list[i] = {name = blue, count = 1, parameters = {}}
     end
-    return list
+    return sb.jsonMerge(list)
   end
 
   function item.hasItemTag(tag)
@@ -115,7 +115,7 @@ function update(data)
   local applied = false
 
   if instance.scripts then
-    makeCallbacks(augmentItem, augmentConfig, instance)
+    makeCallbacks(augmentItem, instance, augmentConfig.directory)
     
     for _, script in ipairs(instance.scripts) do
       script = absolutePath(augmentConfig.directory, script)
