@@ -202,6 +202,8 @@ function update(data)
   local applied = false
 
   if instance.scripts then
+    update, versioning, celestial = nil, nil, nil
+    
     makeCallbacks(augmentItem, instance, augmentConfig.directory)
     
     for _, script in ipairs(instance.scripts) do
