@@ -336,7 +336,7 @@ function update(data)
         if consume and consume > 0 then item.consume(consume) end
       end
       
-      return { output, augmentItem }
+      return { item = output, augment = augmentItem }
     end
   end
 
