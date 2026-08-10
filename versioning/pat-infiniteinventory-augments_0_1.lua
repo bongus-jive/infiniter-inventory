@@ -199,7 +199,6 @@ function update(data)
   
   local augmentConfig = root.itemConfig(augmentItem)
   local instance = sb.jsonMerge(augmentConfig.config, augmentConfig.parameters)
-  local applied = false
 
   if instance.scripts then
     self = {}
@@ -216,12 +215,13 @@ function update(data)
     if type(apply) == "function" then
       local output, consume = apply(targetItem)
       if output then
-        applied = true
-        targetItem = output
+        output = root.createItem(output)
         if consume and consume > 0 then item.consume(consume) end
       end
+      
+      return { output, augmentItem }
     end
   end
 
-  return { applied, targetItem, augmentItem }
+  return {}
 end
