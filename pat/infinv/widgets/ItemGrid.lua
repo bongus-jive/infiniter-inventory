@@ -181,10 +181,8 @@ function ItemGridWidget:rightClick(slot)
   if swapItem and not root.itemDescriptorsMatch(slotItem, swapItem, true) then
     if root.itemType(swapItem.name) == "augmentitem" then
       local newItem, newAugment = self:applyAugment(slotItem, swapItem)
-      if newItem then
-        self:setSlotItem(slot, newItem)
-        player.setSwapSlotItem(newAugment)
-      end
+      if newItem then self:setSlotItem(slot, newItem) end
+      if newAugment then player.setSwapSlotItem(newAugment) end
     end
     
     return
@@ -223,11 +221,11 @@ function ItemGridWidget:applyAugment(item, augment)
 
   if not success then
     -- sb.logError(result)
-    return pane.playSound("/sfx/interface/clickon_error.ogg")
+    pane.playSound("/sfx/interface/clickon_error.ogg")
+    return
   end
 
-  if not result[1] then return end
-  return result[2], result[3]
+  return result[1], result[2]
 end
 
 function ItemGridWidget:shiftHeld()
