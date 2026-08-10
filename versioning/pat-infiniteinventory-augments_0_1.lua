@@ -96,7 +96,7 @@ local function makeCallbacks(itemDesc, instance, directory)
       return rarities[instance.rarity:lower()] end
   end
 
-  do
+  do -- iconDrawables & dropDrawables
     local function drawableMakeImage(image, position)
       image = absolutePath(directory, image)
       local size = root.imageSize(image)
@@ -185,8 +185,125 @@ local function makeCallbacks(itemDesc, instance, directory)
     end
   end
 
-  --todo
-  function item.pickupQuestTemplates() error() end
+  do -- pickupQuestTemplates
+    local questDetail = {}
+    function questDetail.item(out, json)
+      out.item = root.createItem(json.item) end
+
+    function questDetail.itemTag(out, json)
+      out.tag = json.tag end
+
+    function questDetail.itemList(out, json)
+      out.items = jarray()
+      for i, item in ipairs(json.items) do
+        out.items[i] = root.createItem(item)
+      end
+    end
+
+    function questDetail.entity(out, json)
+      out.uniqueId = json.uniqueId
+      out.species = json.species
+      out.gender = json.gender and json.gender:lower() or nil
+    end
+
+    function questDetail.location(out, json)
+      out.uniqueId = json.uniqueId
+      out.region = json.region
+    end
+
+    function questDetail.monsterType(out, json)
+      out.typeName = json.typeName
+      out.parameters = json.parameters or jobject()
+    end
+
+    function questDetail.npcType(out, json)
+      out.species = json.species
+      out.typeName = json.typeName
+      out.parameters = json.parameters or jobject()
+      out.seed = json.seed
+    end
+
+    function questDetail.coordinate(out, json)
+      local jco = json.coordinate
+      local coord = jobject()
+      out.coordinate = coord
+
+      if type(jco) == "string" then
+        local list = {}
+        for part in jco:gmatch("[^ _:]+") do
+          list[#list + 1] = tonumber(part)
+        end
+        coord.location = table.move(list, 1, 3, 1, jarray())
+        coord.planet = list[4] or 0
+        coord.satellite = list[5] or 0
+      else
+        coord.location = jco.location
+        coord.planet = jco.planet or 0
+        coord.satellite = jco.satellite or 0
+      end
+    end
+
+    function questDetail.json(_, json) return json end
+    function questDetail.noDetail() end
+
+    local function paramFromJson(json)
+      local out = jobject()
+      local detail = questDetail[json.type]
+      if detail then
+        out = detail(out, json) or out
+      end
+      out.type = json.type
+      out.name = json.name
+      out.portrait = json.portrait
+      out.indicator = json.indicator
+      return out
+    end
+
+    local function questFromJson(json)
+      local out = jobject()
+      out.parameters = jobject()
+      out.seed = rand:randu64()
+
+      if type(json) == "string" then
+        out.questId = json
+        out.templateId = json
+      else
+        out.questId = json.questId
+        out.templateId = json.templateId
+        if json.seed then out.seed = json.seed end
+        for k, v in pairs(json.parameters or {}) do
+          out.parameters[k] = paramFromJson(v)
+        end
+      end
+
+      return out
+    end
+
+    local function arcFromJson(json)
+      local out = jobject()
+      out.quests = jarray()
+      out.stagehandUniqueId = nil
+
+      if type(json) == "table" and json.quests then
+        out.stagehandUniqueId = json.stagehandUniqueId
+        for i, quest in ipairs(json.quests) do
+          out.quests[i] = questFromJson(quest)
+        end
+      else
+        out.quests[1] = questFromJson(json)
+      end
+
+      return out
+    end
+
+    function item.pickupQuestTemplates()
+      local quests = {}
+      for i, quest in ipairs(sb.jsonQuery(instance, "pickupQuestTemplates", {})) do
+        quests[i] = arcFromJson(quest)
+      end
+      return sb.jsonMerge(quests)
+    end
+  end
 end
 
 function update(data)
