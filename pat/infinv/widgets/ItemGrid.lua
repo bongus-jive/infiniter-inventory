@@ -225,7 +225,7 @@ function ItemGridWidget:applyAugment(item, augment)
     return
   end
 
-  return result[1], result[2]
+  return result.item, result.augment
 end
 
 function ItemGridWidget:shiftHeld()
