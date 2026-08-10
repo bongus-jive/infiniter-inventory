@@ -220,7 +220,7 @@ function ItemGridWidget:applyAugment(item, augment)
   local success, result = pcall(root.loadVersionedJson, vj, vj.id)
 
   if not success then
-    -- sb.logError(result)
+    sb.logError(result)
     pane.playSound("/sfx/interface/clickon_error.ogg")
     return
   end
