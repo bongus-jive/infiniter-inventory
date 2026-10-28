@@ -16,18 +16,7 @@ function TabListWidget:init()
   self.data = widget.getData(self.widgetName) or {}
   self:clear()
 
-  self._select = function()
-    if self._skipSelectCallback then return end
-    
-    local id = widget.getListSelected(self.widgetName)
-
-    local oldTab = self.selectedTab
-    self.selectedTab = self.tabs[id]
-
-    if self.callback then
-      self.callback(self.selectedTab, oldTab)
-    end
-  end
+  self._select = function() self:onSelect() end
 end
 
 function TabListWidget:clear()
@@ -54,6 +43,19 @@ function TabListWidget:reindex(start)
     local tab = self.tabs[i]
     tab.index = i
     tab:initChildren()
+  end
+end
+
+function TabListWidget:onSelect()
+  if self._skipSelectCallback then return end
+
+  local id = widget.getListSelected(self.widgetName)
+
+  local oldTab = self.selectedTab
+  self.selectedTab = self.tabs[id]
+
+  if self.callback then
+    self.callback(self.selectedTab, oldTab)
   end
 end
 
