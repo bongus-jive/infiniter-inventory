@@ -24,22 +24,32 @@ end
 function ImagePickerWidget:buildList()
   local images = root.assetJson(self.data.images)
 
-  local legacyCount = 0
+  self.legacyCount = 0
   for _, group in ipairs(images) do
-    if type(group) == "string" then
-      legacyCount = legacyCount + 1
-      self:addItem(legacyCount, "__legacy", group)
-    else
-      for i, image in ipairs(group.images) do
-        self:addItem(i, group.group, image)
-      end
-    end
+    self:addGroup(group)
+  end
+
+  self.defaultItem = self.items[1] or select(2, next(self.items))
+end
+
+function ImagePickerWidget:addGroup(group)
+  if type(group) == "string" then
+    self.legacyCount = (self.legacyCount or 0) + 1
+    self:addItem("__legacy:"..legacyCount, group)
+    return
+  end
+
+  local name = group.group
+  if name == "" then name = nil end
+
+  for i, image in ipairs(group.images) do
+    local index = i
+    if name then index = fmt("%s:%s", name, i) end
+    self:addItem(index, image)
   end
 end
 
-function ImagePickerWidget:addItem(index, group, image)
-  if group and group:len() > 0 then index = fmt("%s:%s", group, index) end
-
+function ImagePickerWidget:addItem(index, image)
   local item = {}
   item.id = widget.addListItem(self.widgetName)
   item.index = index
@@ -69,12 +79,16 @@ function ImagePickerWidget:getSelected()
 end
 
 function ImagePickerWidget:setSelected(index)
-  local item = self.items[index] or self.items[1]
+  local item = self.items[index] or self.defaultItem
+  if not item then return end
+
   widget.setListSelected(self.widgetName, item.id)
 end
 
 function ImagePickerWidget:getImage(index)
-  local item = self.items[index] or self.items[1]
+  local item = self.items[index] or self.defaultItem
+  if not item then return "" end
+
   return item.baseImage and sb.replaceTags(item.baseImage, self.imageTags) or ""
 end
 
