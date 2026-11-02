@@ -34,7 +34,10 @@ function AutoLayout:apply(widgetName, modes)
   local pos = widget.getPosition(widgetName)
   local size = widget.getSize(widgetName)
 
-  if not (pos or size) then return end
+  if not (pos or size) then
+    sb.logWarn("InfiniterInventory Layout: no widget '%s'", widgetName)
+    return
+  end
 
   for _, mode in ipairs(modes) do
     if mode == "x" then
@@ -49,6 +52,8 @@ function AutoLayout:apply(widgetName, modes)
       pos[1] = pos[1] + (self.xOffset / 2)
     elseif mode == "y_center" then
       pos[1] = pos[1] + (self.xOffset / 2)
+    else
+      sb.logWarn("InfiniterInventory Layout: no mode '%s'", mode)
     end
   end
 
