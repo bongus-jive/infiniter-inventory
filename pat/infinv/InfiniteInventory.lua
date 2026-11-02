@@ -1,5 +1,6 @@
 require "/pat/infinv/InvData.lua"
 require "/pat/infinv/Searcher.lua"
+require "/pat/infinv/Layout.lua"
 require "/pat/infinv/WidgetCallbacks.lua"
 require "/pat/infinv/widgets/TabList.lua"
 require "/pat/infinv/widgets/ItemGrid.lua"
@@ -22,6 +23,8 @@ PageBar = PageBarWidget:new("gridLayout.pageBar")
 local fmt = string.format
 
 function init()
+  AutoLayout:init()
+
   PaneId = config.getParameter("_paneId")
   restorePosition()
 
@@ -187,7 +190,24 @@ function updateBorder()
   BorderColorbox:setText(data.borderColor)
 
   local image = BorderPicker:getImage(data.borderIndex)
-  widget.setImage("border", image)
+
+  for _, bgPart in ipairs({"header", "body", "footer"}) do
+    local set = {}
+    set["begin"] = sb.replaceTags(image, { frame = fmt("%s.begin", bgPart) })
+    set["inner"] = sb.replaceTags(image, { frame = fmt("%s.inner", bgPart) })
+    set["end"  ] = sb.replaceTags(image, { frame = fmt("%s.end",   bgPart) })
+    
+    local fullName = fmt("bgStretch.%s", bgPart)
+    local child = {
+      type = "imageStretch",
+      position = widget.getPosition(fullName),
+      size = widget.getSize(fullName),
+      stretchSet = set
+    }
+
+    widget.removeChild("bgStretch", bgPart)
+    widget.addChild("bgStretch", child, bgPart)
+  end
 end
 
 function updateBacking()
