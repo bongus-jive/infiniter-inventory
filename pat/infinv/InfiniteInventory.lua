@@ -23,8 +23,6 @@ PageBar = PageBarWidget:new("gridLayout.pageBar")
 local fmt = string.format
 
 function init()
-  AutoLayout:init()
-
   PaneId = config.getParameter("_paneId")
   restorePosition()
 

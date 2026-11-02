@@ -1,29 +1,30 @@
 AutoLayout = {}
 
-local DEFAULT_WIDTH = 250
-local DEFAULT_HEIGHT = 166
+local fmt = string.format
 local TEST_WIDGET = "_AutoLayout"
-local BACKGROUNDS = { "gui.pane.fileHeader", "gui.pane.fileBody", "gui.pane.fileFooter" }
 
-function AutoLayout:init()
-  if widget.getData(TEST_WIDGET) then return end
-  pane.addWidget({ type = "widget", data = true }, TEST_WIDGET)
+function AutoLayout:setSize(width, height)
+  local cfg = config.getParameter("autoLayout")
 
-  local w, h = 0, 0
-  for _, part in ipairs(BACKGROUNDS) do
-    local img = config.getParameter(part)
-    if img and img:len() > 0 then
-      local size = root.imageSize(img)
-      w = math.max(w, size[1])
-      h = h + size[2]
-    end
-  end
+  local current = widget.getData(TEST_WIDGET) or cfg.defaultSize
+  if width == current[1] and height == current[2] then return end
 
-  self.xOffset = w - DEFAULT_WIDTH
-  self.yOffset = h - DEFAULT_HEIGHT
+  local img = cfg.resizeImage .. "?scalenearest=%s;%s"
+  
+  local layout = { type = "layout", layoutType = "basic", data = { width, height }, children = { } }
+  layout.children.bg = {
+    type = "background",
+    fileHeader = fmt(img, width, cfg.headerHeight),
+    fileFooter = fmt(img, width, cfg.footerHeight),
+    fileBody = fmt(img, width, height - cfg.headerHeight - cfg.footerHeight)
+  }
 
-  local cfg = config.getParameter("autoLayout", {})
-  for widgetName, modes in pairs(cfg) do
+  pane.removeWidget(TEST_WIDGET)
+  pane.addWidget(layout, TEST_WIDGET)
+
+  self.xOffset = width - current[1]
+  self.yOffset = height - current[2]
+  for widgetName, modes in pairs(cfg.widgets) do
     self:apply(widgetName, modes)
   end
 end
