@@ -1,5 +1,4 @@
 PageBarWidget = {}
-local fmt = string.format
 
 function PageBarWidget:new(name)
   local new = {}
