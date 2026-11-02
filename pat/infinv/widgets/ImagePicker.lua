@@ -87,9 +87,9 @@ end
 
 function ImagePickerWidget:getImage(index)
   local item = self.items[index] or self.defaultItem
-  if not item then return "" end
+  if not item or not item.baseImage then return "" end
 
-  return item.baseImage and sb.replaceTags(item.baseImage, self.imageTags) or ""
+  return sb.replaceTags(item.baseImage, self.imageTags)
 end
 
 function ImagePickerWidget:setTag(name, value)
