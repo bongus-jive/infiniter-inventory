@@ -9,9 +9,14 @@ function AutoLayout:setSize(width, height)
   local current = widget.getData(TEST_WIDGET) or cfg.defaultSize
   if width == current[1] and height == current[2] then return end
 
+  self.lastSize = current
+  self.size = { width, height }
+  self.xOffset = width - current[1]
+  self.yOffset = height - current[2]
+
   local img = cfg.resizeImage .. "?scalenearest=%s;%s"
   
-  local layout = { type = "layout", layoutType = "basic", data = { width, height }, children = { } }
+  local layout = { type = "layout", layoutType = "basic", data = self.size, children = { } }
   layout.children.bg = {
     type = "background",
     fileHeader = fmt(img, width, cfg.headerHeight),
@@ -21,9 +26,6 @@ function AutoLayout:setSize(width, height)
 
   pane.removeWidget(TEST_WIDGET)
   pane.addWidget(layout, TEST_WIDGET)
-
-  self.xOffset = width - current[1]
-  self.yOffset = height - current[2]
   for widgetName, modes in pairs(cfg.widgets) do
     self:apply(widgetName, modes)
   end
@@ -50,9 +52,11 @@ function AutoLayout:apply(widgetName, modes)
     elseif mode == "v" then
       size[2] = size[2] + self.yOffset
     elseif mode == "x_center" then
-      pos[1] = pos[1] + (self.xOffset / 2)
+      local dist = pos[1] - (self.lastSize[1] // 2)
+      pos[1] = (self.size[1] // 2) + dist
     elseif mode == "y_center" then
-      pos[1] = pos[1] + (self.xOffset / 2)
+      local dist = pos[2] - (self.lastSize[2] // 2)
+      pos[2] = (self.size[2] // 2) + dist
     else
       sb.logWarn("InfiniterInventory Layout: no mode '%s'", mode)
     end
