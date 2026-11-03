@@ -11,40 +11,56 @@ end
 
 function ItemGridWidget:init()
   self.defaultMaxStack = root.assetJson("/items/defaultParameters.config:defaultMaxStack")
-  self.data = widget.getData(self.widgetName) or {}
-  self.slotCount = self.data.slotCount or 1
+  self.data = widget.getData(self.widgetName)
+
+  self.slots = {}
+  self.slotCount = 0
+  self.dimensions = self.data.dimensions
+  self.backingImage = self.data.backingImage
+
+  self:registerSlotCallback("_slotLeft", self.leftClick)
+  self:registerSlotCallback("_slotRight", self.rightClick)
+  
+  self:createGrid()
+
+  self.highlightTimer = 0
+end
+
+function ItemGridWidget:setDimensions(dimensions)
+  self.dimensions = dimensions
+  self:createGrid()
+end
+
+function ItemGridWidget:createGrid()
+  local dims = self.dimensions
+  local spacing = self.data.spacing
+  local layout = { type = "layout", layoutType = "basic", scissoring = false, children = self.data.template }
+
+  self.slotCount = dims[1] * dims[2]
   self.slots = {}
 
-  widget.clearListItems(self.widgetName)
+  widget.removeAllChildren(self.widgetName)
 
-  self:registerSlotCallback("slot", self.leftClick)
-  self:registerSlotCallback("slot.right", self.rightClick)
-  
   for i = self.slotCount, 1, -1 do
     local slot = {}
     slot.index = i
-    slot.id = widget.addListItem(self.widgetName)
-    slot.name = fmt("%s.%s", self.widgetName, slot.id)
+    slot.name = fmt("%s.%s", self.widgetName, i)
     slot.itemSlot = fmt("%s.slot", slot.name)
     slot.countLabel = fmt("%s.count", slot.name)
     slot.backingImage = fmt("%s.backing", slot.name)
     slot.dimmedImage = fmt("%s.dimmed", slot.name)
     slot.highlightImage = fmt("%s.highlight", slot.name)
     self.slots[i] = slot
+
+    widget.addChild(self.widgetName, layout, tostring(i))
     widget.setData(slot.itemSlot, slot.index)
-  end
 
-  for i = 1, math.floor(self.slotCount / 2) do
-    local slot1 = self.slots[i]
-    local slot2 = self.slots[self.slotCount - i + 1]
-    local pos1 = widget.getPosition(slot1.name)
-    local pos2 = widget.getPosition(slot2.name)
-    widget.setPosition(slot1.name, pos2)
-    widget.setPosition(slot2.name, pos1)
+    local x = spacing[1] * ((i-1) % dims[1])
+    local y = spacing[2] * (dims[2] - ((i-1) // dims[1]) - 1)
+    widget.setPosition(slot.name, {x, y})
   end
-
-  self:setBackingImage(self.data.backingImage)
-  self.highlightTimer = 0
+  
+  self:setBackingImage(self.backingImage)
 end
 
 function ItemGridWidget:update(dt)
@@ -147,10 +163,10 @@ function ItemGridWidget:clearItems()
 end
 
 function ItemGridWidget:registerSlotCallback(callbackName, callback)
-  widget.registerMemberCallback(self.widgetName, callbackName, function(_, index)
+  self[callbackName] = function(_, index)
     if not index or not self.slots[index] then return end
     callback(self, self.slots[index])
-  end)
+  end
 end
 
 function ItemGridWidget:leftClick(slot)
@@ -414,6 +430,8 @@ function ItemGridWidget:takeAll()
 end
 
 function ItemGridWidget:setBackingImage(image)
+  self.backingImage = image
+
   local tags = {backing = image}
 
   local dim = sb.replaceTags(self.data.dimmedImage, tags)
