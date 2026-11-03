@@ -9,8 +9,6 @@ end
 
 function PageBarWidget:init()
   self.canvas = widget.bindCanvas(self.widgetName)
-  self.size = widget.getSize(self.widgetName)
-  self.rect = {0, 0, self.size[1], self.size[2]}
   self.data = widget.getData(self.widgetName)
 end
 
@@ -34,6 +32,9 @@ function PageBarWidget:update()
 end
 
 function PageBarWidget:set(value, max)
+  self.size = widget.getSize(self.widgetName)
+  self.rect = {0, 0, self.size[1], self.size[2]}
+
   local width = self.size[1] / max
   local pos = width * (value - 1)
   self.target = {pos, width}
