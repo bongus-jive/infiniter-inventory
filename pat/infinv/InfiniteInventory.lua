@@ -291,7 +291,30 @@ function changePage(newIndex)
     pages[newIndex] = InvData:newPageId()
     save()
   end
-  local items = InvData:getPageItems(pages[newIndex])
+  updatePageItems()
+end
+
+function updatePageItems()
+  local tab = TabList:getSelected()
+  if not tab then return end
+
+  local pageIndex = math.max(1, math.min(tab.data.pageIndex, #tab.data.pages))
+  local pageId = tab.data.pages[pageIndex]
+  local items = InvData:getPageItems(pageId)
+  
+  local overflow = ItemGrid:splitItemList(items)
+  if overflow then
+    items = overflow[1]
+    InvData:setPageItems(pageId, items)
+
+    for i = 2, #overflow do
+      local id = InvData:newPageId()
+      InvData:setPageItems(id, overflow[i])
+      table.insert(tab.data.pages, pageIndex + i - 1, id)
+    end
+    save()
+  end
+
   ItemGrid:setItems(items)
   Searcher:pageChanged()
   updateWidgets()

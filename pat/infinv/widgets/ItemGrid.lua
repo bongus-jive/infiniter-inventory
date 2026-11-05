@@ -155,6 +155,37 @@ function ItemGridWidget:setItems(items, doCallback)
   if self.callback and doCallback then self.callback() end
 end
 
+function ItemGridWidget:splitItemList(items)
+  local len = jsize(items)
+  if len > self.slotCount then
+    while not items[len] do len = len - 1 end
+  end
+  if len <= self.slotCount then
+    return
+  end
+
+  local pages = {}
+  local page = jarray()
+  local c = 0
+
+  for i = 1, len do
+    local item = items[i]
+    if item then
+      c = c + 1
+      page[c] = item
+    end
+
+    if i == len or c == self.slotCount then
+      jresize(page, self.slotCount)
+      table.insert(pages, page)
+      page = jarray()
+      c = 0
+    end
+  end
+
+  return pages
+end
+
 function ItemGridWidget:clearItems()
   for i = 1, self.slotCount do
     local slot = self.slots[i]

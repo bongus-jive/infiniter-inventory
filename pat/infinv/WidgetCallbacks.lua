@@ -260,12 +260,8 @@ function Callbacks.tabSelected(tab, oldTab)
   updateBorder()
   updateBacking()
   updateTabDefaultButtons()
-
-  local pageIndex = math.max(1, math.min(tab.data.pageIndex, #tab.data.pages))
-  local items = InvData:getPageItems(tab.data.pages[pageIndex])
-  ItemGrid:setItems(items)
-  Searcher:pageChanged()
-  updateWidgets()
+  
+  updatePageItems()
 end
 
 function Callbacks.searchButton()
