@@ -14,20 +14,19 @@ function ItemGridWidget:init()
   self.data = widget.getData(self.widgetName)
 
   self.slots = {}
-  self.slotCount = 0
-  self.dimensions = self.data.dimensions
   self.backingImage = self.data.backingImage
 
   self:registerSlotCallback("_slotLeft", self.leftClick)
   self:registerSlotCallback("_slotRight", self.rightClick)
   
-  self:createGrid()
+  self:setDimensions(self.data.dimensions)
 
   self.highlightTimer = 0
 end
 
-function ItemGridWidget:setDimensions(dimensions)
-  self.dimensions = dimensions
+function ItemGridWidget:setDimensions(dims)
+  self.dimensions = dims
+  self.slotCount = dims[1] * dims[2]
   self:createGrid()
 end
 
@@ -36,7 +35,6 @@ function ItemGridWidget:createGrid()
   local spacing = self.data.spacing
   local layout = { type = "layout", layoutType = "basic", scissoring = false, children = self.data.template }
 
-  self.slotCount = dims[1] * dims[2]
   self.slots = {}
 
   widget.removeAllChildren(self.widgetName)
@@ -55,8 +53,8 @@ function ItemGridWidget:createGrid()
     widget.addChild(self.widgetName, layout, tostring(i))
     widget.setData(slot.itemSlot, slot.index)
 
-    local x = spacing[1] * ((i-1) % dims[1])
-    local y = spacing[2] * (dims[2] - ((i-1) // dims[1]) - 1)
+    local x = spacing[1] * ((i - 1) % dims[1])
+    local y = spacing[2] * (dims[2] - ((i - 1) // dims[1]) - 1)
     widget.setPosition(slot.name, {x, y})
   end
   
