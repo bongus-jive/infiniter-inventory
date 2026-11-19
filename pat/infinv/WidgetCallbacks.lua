@@ -110,18 +110,14 @@ function Callbacks.tabIconSelect()
   if not tab then return end
 
   tab.data.iconIndex = IconPicker:getSelected()
-  updateTabIcon(tab)
-end
-
-function Callbacks.tabIconSlot(item)
-  local tab = TabList:getSelected()
-  if not tab then return end
-
+  
+  local item = IconPicker:getIconSlotItem()
+  tab.data.iconItem = item
   if item then
     jremove(item, "count")
     if jsize(item.parameters) == 0 then jremove(item, "parameters") end
   end
-  tab.data.iconItem = item
+
   updateTabIcon(tab)
 end
 

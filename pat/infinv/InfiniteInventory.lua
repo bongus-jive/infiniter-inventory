@@ -12,9 +12,9 @@ require "/pat/infinv/widgets/ColorTextbox.lua"
 
 TabList = TabListWidget:new("bagTabs.list", Callbacks.tabSelected)
 ItemGrid = ItemGridWidget:new("gridLayout.slots", Callbacks.gridSlotChanged)
-IconPicker = IconPickerWidget:new("editorLayout.editorTabs.tabs.icon.scrollArea.list", Callbacks.tabIconSlot)
-BorderPicker = ImagePickerWidget:new("editorLayout.editorTabs.tabs.border.scrollArea.list")
-BackingPicker = ImagePickerWidget:new("editorLayout.editorTabs.tabs.backing.scrollArea.list")
+IconPicker = IconPickerWidget:new("editorLayout.editorTabs.tabs.icon.scrollArea.list", Callbacks.tabIconSelect)
+BorderPicker = ImagePickerWidget:new("editorLayout.editorTabs.tabs.border.scrollArea.list", Callbacks.tabBorderSelect)
+BackingPicker = ImagePickerWidget:new("editorLayout.editorTabs.tabs.backing.scrollArea.list", Callbacks.tabBackingSelect)
 BorderColorbox = ColorTextboxWidget:new("editorLayout.editorTabs.tabs.border.colorTextbox", Callbacks.tabBorderColor)
 BackingColorbox = ColorTextboxWidget:new("editorLayout.editorTabs.tabs.backing.colorTextbox", Callbacks.tabBackingColor)
 PageScroller = ScrollInputWidget:new("gridLayout.pageScroller", Callbacks.pageScrolling)

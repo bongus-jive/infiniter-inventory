@@ -3,9 +3,8 @@ require "/pat/infinv/widgets/ImagePicker.lua"
 IconPickerWidget = ImagePickerWidget:new()
 local fmt = string.format
 
-function IconPickerWidget:new(name, slotCallback)
-  local new = ImagePickerWidget.new(self, name)
-  new.slotCallback = slotCallback
+function IconPickerWidget:new(name, callback)
+  local new = ImagePickerWidget.new(self, name, callback)
   return new
 end
 
@@ -99,18 +98,20 @@ end
 
 function IconPickerWidget:slotLeft()
   local item = player.swapSlotItem()
-  if not item then return end
+  self:setSelected(-1)
 
-  local current = self:getIconSlotItem()
-  if item and current and root.itemDescriptorsMatch(item, current, true) then
-    item = nil
+  if item then
+    local current = self:getIconSlotItem()
+    if current and root.itemDescriptorsMatch(item, current, true) then
+      item = nil
+    end
+    self:setIconSlotItem(item)
   end
-
-  self:setIconSlotItem(item)
-  if self.slotCallback then self.slotCallback(item) end
+  
+  self.callback()
 end
 
 function IconPickerWidget:slotRight()
   self:setIconSlotItem()
-  if self.slotCallback then self.slotCallback() end
+  self.callback()
 end
