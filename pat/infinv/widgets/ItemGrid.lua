@@ -19,6 +19,7 @@ function ItemGridWidget:init()
   self:registerSlotCallback("_slotLeft", self.leftClick)
   self:registerSlotCallback("_slotRight", self.rightClick)
   
+  widget.removeAllChildren(self.widgetName)
   self:setDimensions(self.data.dimensions)
 
   self.highlightTimer = 0
@@ -35,11 +36,7 @@ function ItemGridWidget:createGrid()
   local spacing = self.data.spacing
   local layout = { type = "layout", layoutType = "basic", scissoring = false, children = self.data.template }
 
-  self.slots = {}
-
-  widget.removeAllChildren(self.widgetName)
-
-  for i = self.slotCount, 1, -1 do
+  for i = #self.slots + 1, self.slotCount do
     local slot = {}
     slot.index = i
     slot.name = fmt("%s.%s", self.widgetName, i)
@@ -52,10 +49,17 @@ function ItemGridWidget:createGrid()
 
     widget.addChild(self.widgetName, layout, tostring(i))
     widget.setData(slot.itemSlot, slot.index)
+  end
 
-    local x = spacing[1] * ((i - 1) % dims[1])
-    local y = spacing[2] * (dims[2] - ((i - 1) // dims[1]) - 1)
-    widget.setPosition(slot.name, {x, y})
+  for i, slot in pairs(self.slots) do
+    if i > self.slotCount then
+      self.slots[i] = nil
+      widget.removeChild(self.widgetName, tostring(i))
+    else
+      local x = spacing[1] * ((i - 1) % dims[1])
+      local y = spacing[2] * (dims[2] - ((i - 1) // dims[1]) - 1)
+      widget.setPosition(slot.name, {x, y})
+    end
   end
   
   self:setBackingImage(self.backingImage)
