@@ -43,19 +43,19 @@ function ImagePickerWidget:addGroup(group)
   if name == "" then name = nil end
 
   for i, image in ipairs(group.images) do
-    local index = i
-    if name then index = fmt("%s:%s", name, i) end
-    self:addItem(index, image)
+    local key = i
+    if name then key = fmt("%s:%s", name, i) end
+    self:addItem(key, image)
   end
 end
 
-function ImagePickerWidget:addItem(index, image)
+function ImagePickerWidget:addItem(key, image)
   local item = {}
   item.id = widget.addListItem(self.widgetName)
-  item.index = index
+  item.key = key
   item.name = fmt("%s.%s", self.widgetName, item.id)
   item.iconName = fmt("%s.icon", item.name)
-  widget.setData(fmt("%s.button", item.name), { parent = self.widgetName, index = index })
+  widget.setData(fmt("%s.button", item.name), { parent = self.widgetName, index = key })
 
   if image then
     item.baseImage = image
@@ -67,7 +67,7 @@ function ImagePickerWidget:addItem(index, image)
     end
   end
 
-  self.items[index] = item
+  self.items[key] = item
   self.itemIds[item.id] = item
   return item
 end
@@ -75,18 +75,18 @@ end
 function ImagePickerWidget:getSelected()
   local id = widget.getListSelected(self.widgetName)
   local item = self.itemIds[id]
-  return item.index, item.special
+  return item.key, item.special
 end
 
-function ImagePickerWidget:setSelected(index)
-  local item = self.items[index] or self.defaultItem
+function ImagePickerWidget:setSelected(key)
+  local item = self.items[key] or self.defaultItem
   if not item then return end
 
   widget.setListSelected(self.widgetName, item.id)
 end
 
-function ImagePickerWidget:getImage(index)
-  local item = self.items[index] or self.defaultItem
+function ImagePickerWidget:getImage(key)
+  local item = self.items[key] or self.defaultItem
   if not item or not item.baseImage then return "" end
 
   return sb.replaceTags(item.baseImage, self.imageTags)

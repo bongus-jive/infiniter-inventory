@@ -28,11 +28,11 @@ function IconPickerWidget:buildList()
   ImagePickerWidget.buildList(self)
 end
 
-function IconPickerWidget:getImage(index, item)
-  if index == -1 then
+function IconPickerWidget:getImage(key, item)
+  if key == -1 then
     return self:getItemIcon(item)
   end
-  return ImagePickerWidget.getImage(self, index)
+  return ImagePickerWidget.getImage(self, key)
 end
 
 function IconPickerWidget:getIconSlotItem()
