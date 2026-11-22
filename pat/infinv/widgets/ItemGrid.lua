@@ -325,11 +325,11 @@ function ItemGridWidget:sortStacks(unsorted)
   jresize(items, self.slotCount)
 
   local itemData = {}
-  for _, item in next, unsorted do
+  for i, item in next, unsorted do
     items[#items + 1] = item
     local rarity = (item.parameters.rarity or root.itemConfig(item).config.rarity or "common"):lower()
     local itemType = root.itemType(item.name)
-    itemData[item] = { rarity = rarities[rarity], type = itemTypes[itemType] }
+    itemData[item] = { rarity = rarities[rarity], type = itemTypes[itemType], index = i }
   end
 
   table.sort(items, function(a, b)
@@ -343,7 +343,7 @@ function ItemGridWidget:sortStacks(unsorted)
     if a.name ~= b.name then return a.name < b.name end
     if a.count ~= b.count then return a.count > b.count end
 
-    return false
+    return aData.index < bData.index
   end)
 
   return items
