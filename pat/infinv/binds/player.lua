@@ -1,7 +1,9 @@
-local cfg = { baseConfig = "/pat/infinv/infinv.config" }
+local cfg = { baseConfig = "/pat/infinv/infinv.config", gui = {} }
 local paneId, openTicks
 
 function init()
+  setSize(storage.size)
+
   local function setLocalHandler(name, func)
     message.setHandler(name, function(_, isLocal, ...)
       if isLocal then return func(...) end
@@ -9,6 +11,7 @@ function init()
   end
   setLocalHandler("pat_infinv_open", open)
   setLocalHandler("pat_infinv_shouldClose", shouldClose)
+  setLocalHandler("pat_infinv_setSize", setSize)
 end
 
 function update()
@@ -42,4 +45,20 @@ function shouldClose(id)
   
   openTicks = nil
   return true
+end
+
+function setSize(size)
+  if not size then
+    if storage.size then jremove(storage, "size") end
+    cfg.gui.pane = nil
+    return
+  end
+
+  storage.size = size
+  cfg.gui.pane = {
+    type = "background",
+    fileBody = "",
+    fileFooter = "",
+    fileHeader = ("/pat/infinv/images/panesize.png?scalenearest=%s;%s"):format(size[1], size[2])
+  }
 end

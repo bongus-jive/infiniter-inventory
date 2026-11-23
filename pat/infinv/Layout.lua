@@ -29,6 +29,13 @@ function AutoLayout:setSize(width, height)
   for widgetName, modes in pairs(cfg.widgets) do
     self:apply(widgetName, modes)
   end
+
+  local pid = player.id()
+  if pid ~= 0 then
+    local s = self.size
+    if width == cfg.defaultSize[1] and height == cfg.defaultSize[2] then s = nil end
+    world.sendEntityMessage(pid, "pat_infinv_setSize", s)
+  end
 end
 
 function AutoLayout:apply(widgetName, modes)
