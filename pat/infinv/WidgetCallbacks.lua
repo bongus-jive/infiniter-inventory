@@ -260,6 +260,10 @@ function Callbacks.tabSelected(tab, oldTab)
   updatePageItems()
 end
 
+function Callbacks.gridSpinnerSave()
+  setGridSize({ColSpinner.value, RowSpinner.value})
+end
+
 function Callbacks.searchButton()
   if not widget.active("search") then
     widget.setVisible("search", true)

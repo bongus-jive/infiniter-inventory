@@ -63,6 +63,24 @@ function TabListWidget:getSelected()
   return self.selectedTab
 end
 
+function TabListWidget:deselect()
+  if not self.selectedTab then return end
+
+  self._skipSelectCallback = true
+  self.selectedTab = nil
+  local new = widget.addListItem(self.widgetName)
+  widget.setListSelected(self.widgetName, new)
+  widget.removeListItem(self.widgetName, #self.tabs)
+  self._skipSelectCallback = false
+end
+
+function TabListWidget:reselect()
+  local tab = self.selectedTab
+  if not tab then return end
+  self:deselect()
+  tab:select()
+end
+
 function TabListWidget:resetHighlighted()
   for _, tab in pairs(self.tabs) do
     tab:setHighlighted(false)

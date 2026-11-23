@@ -9,9 +9,12 @@ require "/pat/infinv/widgets/IconPicker.lua"
 require "/pat/infinv/widgets/ScrollInput.lua"
 require "/pat/infinv/widgets/PageBar.lua"
 require "/pat/infinv/widgets/ColorTextbox.lua"
+require "/pat/infinv/widgets/Spinner.lua"
 
 TabList = TabListWidget:new("bagTabs.list", Callbacks.tabSelected)
 ItemGrid = ItemGridWidget:new("gridLayout.slots", Callbacks.gridSlotChanged)
+ColSpinner = SpinnerWidget:new("editorLayout.editorTabs.tabs.grid.scrollArea.colSpinner")
+RowSpinner = SpinnerWidget:new("editorLayout.editorTabs.tabs.grid.scrollArea.rowSpinner")
 IconPicker = IconPickerWidget:new("editorLayout.editorTabs.tabs.icon.scrollArea.list", Callbacks.tabIconSelect)
 BorderPicker = ImagePickerWidget:new("editorLayout.editorTabs.tabs.border.scrollArea.list", Callbacks.tabBorderSelect)
 BackingPicker = ImagePickerWidget:new("editorLayout.editorTabs.tabs.backing.scrollArea.list", Callbacks.tabBackingSelect)
@@ -28,6 +31,8 @@ function init()
 
   TabList:init()
   ItemGrid:init()
+  ColSpinner:init()
+  RowSpinner:init()
   IconPicker:init()
   BorderPicker:init()
   BackingPicker:init()
@@ -40,19 +45,20 @@ function init()
   Strings.tooltips = Strings.tooltips or {}
 
   local bags = InvData:load()
+
+  AutoLayout:init()
+  if InvData.data.grid then
+    ColSpinner:setValue(InvData.data.grid[1])
+    RowSpinner:setValue(InvData.data.grid[2])
+    setGridSize(InvData.data.grid)
+  end
+
   local selectedTab
   for _, tabData in ipairs(bags) do
     local tab = createTab(tabData)
-
     if tabData.selected then selectedTab = tab end
   end
-
-  if not selectedTab then
-    selectedTab = TabList.tabs[1] or createTab()
-  end
-  selectedTab:select()
-
-  updateWidgets()
+  (selectedTab or TabList.tabs[1] or createTab()):select()
 end
 
 function update(dt)
@@ -330,6 +336,21 @@ function getMaxPages()
   if next(lastPageItems) then maxPages = maxPages + 1 end
 
   return maxPages
+end
+
+function setGridSize(dims)
+  if not dims or #dims ~= 2 then return end
+
+  InvData.data.grid = dims
+  AutoLayout:setGridDimensions(dims)
+  ItemGrid:setDimensions(dims)
+
+  TabList:reselect()
+  PageScroller:createWheel()
+  IconPicker:updatePositions()
+  BorderPicker:updatePositions()
+  BackingPicker:updatePositions()
+  Searcher:restart()
 end
 
 function storePosition()

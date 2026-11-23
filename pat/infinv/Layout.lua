@@ -3,11 +3,24 @@ AutoLayout = {}
 local fmt = string.format
 local TEST_WIDGET = "_AutoLayout"
 
+function AutoLayout:init()
+  self.config = config.getParameter("autoLayout")
+end
+
+function AutoLayout:setGridDimensions(dims)
+  local w = self.config.baseSize[1] + (dims[1] * self.config.gridItemSize[1])
+  local h = self.config.baseSize[2] + (dims[2] * self.config.gridItemSize[2])
+  self:setSize(w, h)
+end
+
 function AutoLayout:setSize(width, height)
-  local cfg = config.getParameter("autoLayout")
+  local cfg = self.config
 
   local current = widget.getData(TEST_WIDGET) or cfg.defaultSize
   if width == current[1] and height == current[2] then return end
+
+  width = math.max(width, cfg.defaultSize[1])
+  height = math.max(height, cfg.defaultSize[2])
 
   self.lastSize = current
   self.size = { width, height }
